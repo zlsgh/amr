@@ -26,8 +26,9 @@ def main():
     msg = email.message_from_file(fp)
     fp.close()
     for part in msg.walk():
-        print part    
+        print part
     
+
     #headers = Parser().parse(open("0.txt", 'r'))
     #print 'To: %s' % headers['to']
     #print 'From: %s' % headers['from']
