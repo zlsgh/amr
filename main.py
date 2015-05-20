@@ -27,6 +27,7 @@ def main():
     fp.close()
     for part in msg.walk():
         print part
+
     #headers = Parser().parse(open("0.txt", 'r'))
     #print 'To: %s' % headers['to']
     #print 'From: %s' % headers['from']
