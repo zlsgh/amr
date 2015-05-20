@@ -17,17 +17,22 @@
 ## Imports
 from math import *
 import nltk
+import email
 from email.parser import Parser
 
 ## Main program
 def main():
-    headers = Parser().parse(open("0.txt", 'r'))
-    print 'To: %s' % headers['to']
-    print 'From: %s' % headers['from']
-    print 'Subject: %s' % headers['subject']
-    #fin = open("0.txt",'r')
-    #data = fin.readlines()
-    #print data 
+    fp = open("0.txt")
+    msg = email.message_from_file(fp)
+    fp.close()
+    for part in msg.walk():
+        print part    
+    
+    #headers = Parser().parse(open("0.txt", 'r'))
+    #print 'To: %s' % headers['to']
+    #print 'From: %s' % headers['from']
+    #print 'Subject: %s' % headers['subject']
+    #print 'Message: %s' % headers['body']
     sentence = """This is a test sentence to see if it can be parsed simply."""
     tokens = nltk.word_tokenize(sentence)
     print tokens
