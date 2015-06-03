@@ -16,30 +16,41 @@
 
 ## Imports
 from math import *
+#import MySQLdb
 import nltk
 import email
 from email.parser import Parser
+from Message import Message
 
 ## Main program
 def main():
-    fp = open("0.txt")
+    fn = "0.txt"
+    messages = Message(fn)
+    print messages.getBody()
+
+def readEmail():
+    fp = open("0.txt", 'r')
     msg = email.message_from_file(fp)
     fp.close()
     for part in msg.walk():
-        print part
-
-    #headers = Parser().parse(open("0.txt", 'r'))
-    #print 'To: %s' % headers['to']
-    #print 'From: %s' % headers['from']
-    #print 'Subject: %s' % headers['subject']
+        #print "-------------------"
+        #print part.get_content_type()
+        if part.get_content_type() == "text/plain":
+            body = part.get_payload() # prints the raw text
+            print body
+    headers = Parser().parse(open("0.txt", 'r'))
+    print 'To: %s' % headers['to']
+    print 'From: %s' % headers['from']
+    print 'Subject: %s' % headers['subject']
     #print 'Message: %s' % headers['body']
-    sentence = """This is a test sentence to see if it can be parsed simply."""
-    tokens = nltk.word_tokenize(sentence)
-    print tokens
+    #sentence = """This is a test sentence to see if it can be parsed simply."""
+    #tokens = nltk.word_tokenize(sentence)
+    #print tokens
 
 ## Run the main program
 if __name__ == '__main__':
     main()
+    #readEmail()
 
 ##
 ######
