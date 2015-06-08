@@ -1,0 +1,63 @@
+                                                                                                                                                                                                                                                               
+Delivered-To: zacheryschiller@gmail.com
+Received: by 10.107.167.203 with SMTP id q194csp3266170ioe;
+        Sun, 17 May 2015 15:08:53 -0700 (PDT)
+X-Received: by 10.152.234.42 with SMTP id ub10mr14926603lac.60.1431900533025;
+        Sun, 17 May 2015 15:08:53 -0700 (PDT)
+Return-Path: <zschiller@rsu26.org>
+Received: from mail-la0-f47.google.com (mail-la0-f47.google.com. [209.85.215.47])
+        by mx.google.com with ESMTPS id s7si5476631las.80.2015.05.17.15.08.52
+        for <zacheryschiller@gmail.com>
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 17 May 2015 15:08:52 -0700 (PDT)
+Received-SPF: pass (google.com: domain of zschiller@rsu26.org designates 209.85.215.47 as permitted sender) client-ip=209.85.215.47;
+Authentication-Results: mx.google.com;
+       spf=pass (google.com: domain of zschiller@rsu26.org designates 209.85.215.47 as permitted sender) smtp.mail=zschiller@rsu26.org
+Received: by mail-la0-f47.google.com with SMTP id v1so193499005lag.3
+        for <zacheryschiller@gmail.com>; Sun, 17 May 2015 15:08:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20130820;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+         :content-type;
+        bh=lRyCzovt4gJsPuEzu6q9dzSjJbXrcSYkvyIUKjQFbs0=;
+        b=GzSgr8a57VljRQEK3qlaFZh8d0qFLjjOa+QhvMbnPDsFu7HWBsWGKcPvGwmHasDhgK
+         cDZOlCMfNLGYCHLV4DJvnU02bN+u1wyve45v/g3VkTWUfSswhtrHNg7LQUquvdd2em5i
+         ACmeVlXQswBwYJLn686NjKgJWGVrMb5iMqFviFnLsZDV/lSAFP2/OuQQjMZeF9kX/+0T
+         bNXrA1A3KhvYhWgDe1e1kKXzpKIGIImpW3spN+xz4SaiSt4Chq6EZePgPkYoaxBp28Um
+         a5WtNPV5G5UvhyJuxWuvFreQGx7Pwx5RC8YcS8G+ucFALqJK+Bv0RjYDTNuicg6KaOAH
+         jRZA==
+X-Gm-Message-State: ALoCoQkqy9pgOY5OuxI5D4WbuVThf6pjqbmvYEMAGuq6t6GY6TGZotMwuLryqX3JJ2GSvwutthVb
+X-Received: by 10.112.214.202 with SMTP id oc10mr12584457lbc.80.1431900532082;
+ Sun, 17 May 2015 15:08:52 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 10.25.22.34 with HTTP; Sun, 17 May 2015 15:08:31 -0700 (PDT)
+From: Zachery Schiller <zschiller@rsu26.org>
+Date: Sun, 17 May 2015 18:08:31 -0400
+Message-ID: <CAMgkhc9PbQMVbPWEvHGmqnw_-p2R7+moH=inAi9bCGKs_PFkDA@mail.gmail.com>
+Subject: Server IP Address
+To: Zachery Schiller <zacheryschiller@gmail.com>
+Content-Type: multipart/alternative; boundary=001a11345dd4919a6105164e526a
+
+--001a11345dd4919a6105164e526a
+Content-Type: text/plain; charset=UTF-8
+
+What is the IP address for the server again? I always seem to forget it.
+Thank you!
+
+-- 
+Mr. Schiller
+IT Manager - RSU 26
+Linked in <http://www.linkedin.com/pub/zachery-schiller/23/393/756>
+
+--001a11345dd4919a6105164e526a
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">What is the IP address for the server again? I always seem=
+ to forget it. Thank you!<br clear=3D"all"><div><br></div>-- <br><div class=
+=3D"gmail_signature"><div dir=3D"ltr">Mr. Schiller<div>IT Manager - RSU 26<=
+br><div><a href=3D"http://www.linkedin.com/pub/zachery-schiller/23/393/756"=
+ target=3D"_blank">Linked in</a></div></div></div></div>
+</div>
+
+--001a11345dd4919a6105164e526a--

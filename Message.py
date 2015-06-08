@@ -27,31 +27,44 @@ class Message:
     def __init__(self, fileLocation):
         self.fileLocation = fileLocation
         self.readEmail()
+        self.stripSignature()
+        self.tokens = nltk.word_tokenize(self.body)
         print "Created message"
 
     def readEmail(self):
-        fp = open(self.fileLocation, 'r')
+        fp = open(self.fileLocation, 'U')
         msg = email.message_from_file(fp)
         fp.close()
         for part in msg.walk():
             #print "-------------------"
-            #print part.get_content_type()
+            print part.get_content_type()
             if part.get_content_type() == "text/plain":
                 self.body = part.get_payload() # prints the raw text
-        headers = Parser().parse(open(self.fileLocation, 'r'))
+        headers = Parser().parse(open(self.fileLocation, 'U'))
         self.toAddress = headers['to']
         self.fromAddress = headers['from']
         self.subject = headers['subject']
 
     def stripSignature(self):
-#lines that equal '-- \n' (standard email sig delimiter)
-#lines that equal '--\n' (people often forget the space in sig delimiter; and this is not that common outside sigs)
-#lines that begin with '-----original message-----' (ms outlook default)
-#lines that begin with '________________________________' (32 underscores, outlook again)
-#lines that begin with 'on ' and end with ' wrote:\n' (os x mail.app default)
-#lines that begin with 'from: ' (failsafe four outlook and some other reply formats)
-#lines that begin with 'sent from my iphone'
-#lines that begin with 'sent from my blackberry'
+        signature = False
+        parts = self.body.split('\n')
+        #print parts
+        newBody = ""
+        for i in range(len(parts)):
+            if (parts[i] == '-- ' or 
+                    parts[i] == '--' or 
+                    parts[i] == '-----original message-----' or 
+                    parts[i] == '________________________________'or
+                    parts[i] == 'sent from my iphone' or 
+                    parts[i] == 'sent from my blackberry'):
+                #print "SIG!!!!!"
+                signature = True
+            if signature == False:
+                newBody = newBody+str(parts[i])+"\n"
+        self.body = newBody
+        #print "-----"
+        #print self.body
+        #print "-----"
  
     def getFileLocation(self):
         return self.fileLocation
@@ -71,7 +84,8 @@ class Message:
     def getKeywords(self):
         return self.keywords
 
-
+    def getTokens(self):
+        return self.tokens
 
 ## Run the main program
 #if __name__ == '__main__':
