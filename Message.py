@@ -17,6 +17,7 @@
 ## Imports
 from math import *
 import nltk
+from nltk.corpus import stopwords
 import email
 from email.parser import Parser
 
@@ -27,8 +28,6 @@ class Message:
     def __init__(self, fileLocation):
         self.fileLocation = fileLocation
         self.readEmail()
-        self.stripSignature()
-        self.tokens = nltk.word_tokenize(self.body)
         print "Created message"
 
     def readEmail(self):
@@ -40,10 +39,17 @@ class Message:
             print part.get_content_type()
             if part.get_content_type() == "text/plain":
                 self.body = part.get_payload() # prints the raw text
+                self.stripSignature()
+                self.findTokens()
         headers = Parser().parse(open(self.fileLocation, 'U'))
         self.toAddress = headers['to']
         self.fromAddress = headers['from']
         self.subject = headers['subject']
+    
+    def findTokens(self):
+        stopwords = nltk.corpus.stopwords.words('english')
+        tempTokens = nltk.word_tokenize(self.body)
+        self.tokens = [w for w in tempTokens if not w in stopwords]
 
     def stripSignature(self):
         signature = False

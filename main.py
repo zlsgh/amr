@@ -24,8 +24,8 @@ from Message import Message
 
 ## Main program
 def main():
-    fn = "0.txt"
-    #fn = "/users/zschiller/desktop/myEmails/email0.txt"
+    #fn = "0.txt"
+    fn = "/users/zschiller/desktop/myEmails/email1.txt"
     messages = Message(fn)
     print messages.getBody()
 
