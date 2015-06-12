@@ -16,21 +16,42 @@
 
 ## Imports
 from math import *
-#import MySQLdb
 import nltk
 import email
 from email.parser import Parser
 from Message import Message
+from gensim import corpora, models, similarities
 
 ## Main program
 def main():
     #fn = "0.txt"
-    fn = "/users/zschiller/desktop/myEmails/email1.txt"
-    messages = Message(fn)
-    print messages.getBody()
+    messages = []
+    keywords = []
+    max = 2
+    for i in range(max):
+        fn = "/users/zschiller/desktop/myEmails/email" + str(i) + ".txt"
+        #print fn
+        messages.append(Message(fn))
+        keywords.append(messages[i].getTokens())
+        #print "______________BODY______________"
+        #print messages[0].getBody()
 
-    #tokens = nltk.word_tokenize(messages.getBody())
-    print messages.getTokens()
+        #print  "______________Keywords______________"
+        #print messages[i].getTokens()
+        l = ' '.join(map(str,messages[i].getTokens()))
+        print l
+        fout = "/users/zschiller/desktop/myEmailsTokens/email" + str(i) + "_tokens.txt"
+        w = open(fout,'w')
+        w.write(l)
+        w.close()
+        print "Done " + str(i) + " of " + str(max)
+
+    #print keywords
+    #dictionary = corpora.Dictionary(keywords)
+    #corpus = [dictionary.doc2bow(keyword) for keyword in keywords]
+    #print dictionary.token2id
+    #print corpus
+
 
 ## Get initial information from the user about haivng a .mbox
 ## or where the email files are stored. Then runs the setup process
