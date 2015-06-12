@@ -28,6 +28,7 @@ class Message:
     """ Message class for each message in user database """
     def __init__(self, fileLocation):
         self.fileLocation = fileLocation
+        self.error = False
         self.readEmail()
         #print "Created message"
 
@@ -46,7 +47,12 @@ class Message:
             if part.get_content_type() == "text/plain":
                 self.body = part.get_payload() # prints the raw text
                 self.stripSignature()
-                self.findTokens()
+                try:
+                    self.findTokens()
+                except:
+                    print "Error!"
+                    self.error = True
+                    self.tokens = []
                 hasBody = True
         if hasBody == False:
             self.body = ""
@@ -56,6 +62,7 @@ class Message:
         stopwords = nltk.corpus.stopwords.words('english')
         stopwords.append(u'http')
         stopwords.append(u'https')
+        stopwords.append(u're')
         punctuations = list(string.punctuation)
         if self.subject is None or self.toAddress is None:
              tempBody = self.body
@@ -127,6 +134,9 @@ class Message:
 
     def getTokens(self):
         return self.tokens
+
+    def getError(self):
+        return self.error
 
 ## Run the main program
 #if __name__ == '__main__':

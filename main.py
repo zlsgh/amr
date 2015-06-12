@@ -20,31 +20,15 @@ import nltk
 import email
 from email.parser import Parser
 from Message import Message
+from MyCorpus import MyCorpus
 from gensim import corpora, models, similarities
 
 ## Main program
 def main():
-    #fn = "0.txt"
-    messages = []
-    keywords = []
-    max = 2
-    for i in range(max):
-        fn = "/users/zschiller/desktop/myEmails/email" + str(i) + ".txt"
-        #print fn
-        messages.append(Message(fn))
-        keywords.append(messages[i].getTokens())
-        #print "______________BODY______________"
-        #print messages[0].getBody()
-
-        #print  "______________Keywords______________"
-        #print messages[i].getTokens()
-        l = ' '.join(map(str,messages[i].getTokens()))
-        print l
-        fout = "/users/zschiller/desktop/myEmailsTokens/email" + str(i) + "_tokens.txt"
-        w = open(fout,'w')
-        w.write(l)
-        w.close()
-        print "Done " + str(i) + " of " + str(max)
+    createKeywordText("/users/zschiller/desktop/myEmails/",17724)
+    corpus_saved = MyCorpus()
+    dic = corpus_saved.getDictionary()
+    print dic.token2id
 
     #print keywords
     #dictionary = corpora.Dictionary(keywords)
@@ -52,6 +36,32 @@ def main():
     #print dictionary.token2id
     #print corpus
 
+def createKeywordText(fileLoc, numFiles):
+    saveCorpus = open('mycorpus.txt','w')
+    messages = []
+    keywords = []
+    numErrors = 0
+    for i in range(numFiles):
+        fn = fileLoc + "email" + str(i) + ".txt"
+        #print fn
+        messages.append(Message(fn))
+        if messages[i].getError():
+            numErrors +=1
+        l = ' '.join(map(str,messages[i].getTokens()))
+        saveCorpus.write(l+'\n')
+        print "Done " + str(i) + " of " + str(numFiles-1)
+        #keywords.append(messages[i].getTokens())
+        #print "______________BODY______________"
+        #print messages[0].getBody()
+        #print  "______________Keywords______________"
+        #print messages[i].getTokens()
+        #print l
+        #fout = "/users/zschiller/desktop/myEmailsTokens/email" + str(i) + "_tokens.txt"
+        #w = open(fout,'w')
+        #w.write(l)
+        #w.close()
+    saveCorpus.close()
+    print "Created corpus file with only " + str(numErrors) + " errors!"
 
 ## Get initial information from the user about haivng a .mbox
 ## or where the email files are stored. Then runs the setup process
