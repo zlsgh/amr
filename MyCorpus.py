@@ -26,11 +26,17 @@ from gensim import corpora, models, similarities
 ## Main program
 class MyCorpus:
     def __init__(self):
-        self.documents = []
+        self.documents = (line.lower().split() for line in open('mycorpus.txt'))
+        #for document in self.documents: print document
         self.dictionary = corpora.Dictionary(line.lower().split() for line in open('mycorpus.txt'))
+        #self.corpus = self.dictionary.doc2bow(self.documents)
     
     def getDictionary(self):
         return self.dictionary
+
+    def getCorpus(self):
+        return self.corpus
+
 ## Run the main program
 #if __name__ == '__main__':
 #    main()

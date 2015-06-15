@@ -10,7 +10,7 @@
 ## Github: https://github.com/zacheryschiller/
 ## 
 ##############################################################################
-
+ 
 ###### 
 ## 
 
@@ -25,11 +25,17 @@ from gensim import corpora, models, similarities
 
 ## Main program
 def main():
-    createKeywordText("/users/zschiller/desktop/myEmails/",17724)
+    #createKeywordText("/users/zschiller/desktop/myEmails/",17724)
     corpus_saved = MyCorpus()
     dic = corpus_saved.getDictionary()
-    print dic.token2id
-
+    once_ids = [tokenid for tokenid, docfreq in dic.dfs.iteritems() if docfreq == 1]
+    dic.filter_tokens(once_ids)
+    dic.compactify()
+    dic.save('savedDictionary.dict')
+    #corp = corpus_saved.getCorpus()
+    #print corp
+    #dic.BleiCorpus.serialize('/tmp/corpus.lda-c', corpus)
+    print dic
     #print keywords
     #dictionary = corpora.Dictionary(keywords)
     #corpus = [dictionary.doc2bow(keyword) for keyword in keywords]
