@@ -23,23 +23,38 @@ from email.parser import Parser
 import string
 from gensim import corpora, models, similarities
 
-## Main program
+## New instance of corpus gets the documents out of mycorpus.txt file
 class MyCorpus:
     def __init__(self):
+        # Get documents out of mycorpus.txt file
         self.documents = (line.lower().split() for line in open('mycorpus.txt'))
-        #for document in self.documents: print document
+
+        # Create Dictionary from documents
         self.dictionary = corpora.Dictionary(line.lower().split() for line in open('mycorpus.txt'))
-        #self.corpus = self.dictionary.doc2bow(self.documents)
-    
+
+        # Filter out the keywords that are only in the corpus once
+        once_ids = [tokenid for tokenid, docfreq in self.dictionary.dfs.iteritems() if docfreq == 1]
+        self.dictionary.filter_tokens(once_ids)
+
+        # This removes gaps after removing tokens
+        self.dictionary.compactify()
+
+        self.corpus = [self.dictionary.doc2bow(doc) for doc in self.documents]
+        #self.corpus = [self.dictionary.doc2bow(text) for text in texts]
+   
     def getDictionary(self):
         return self.dictionary
 
     def getCorpus(self):
         return self.corpus
 
-## Run the main program
-#if __name__ == '__main__':
-#    main()
+    def saveDic(self):
+        self.dictionary.save('savedDictionary.dict')
+
+    def saveCorpus(self):
+        corpora.MmCorpus.serialize('savedCorpus.mm', self.corpus)
+
+
 
 ##
 ######

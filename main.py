@@ -15,6 +15,7 @@
 ## 
 
 ## Imports
+## These are the imports needed to run the program, including GenSim
 from math import *
 import nltk
 import email
@@ -25,23 +26,51 @@ from gensim import corpora, models, similarities
 
 ## Main program
 def main():
+
+    #Good Stuff
+    # Uncomment to create keyword text
     #createKeywordText("/users/zschiller/desktop/myEmails/",17724)
-    corpus_saved = MyCorpus()
-    dic = corpus_saved.getDictionary()
-    once_ids = [tokenid for tokenid, docfreq in dic.dfs.iteritems() if docfreq == 1]
-    dic.filter_tokens(once_ids)
-    dic.compactify()
-    dic.save('savedDictionary.dict')
+    # uncomment to load from mycorpus.txt file
+    #corpus_saved = MyCorpus()
+    #corpus_saved.saveDic()
+    #corpus_saved.saveCorpus()
+    #dic = corpus_saved.getDictionary()
+    #corpus = corpus_saved.getCorpus()
+
+    corpus = corpora.MmCorpus('savedCorpus.mm')
+    dic = corpora.Dictionary.load("savedDictionary.dict")
+
+    lsi = models.LsiModel(corpus, id2word=dic, num_topics=2)
+    index = similarities.MatrixSimilarity(lsi[corpus])
+    index.save('saved.index')
+    index = similarities.MatrixSimilarity.load('saved.index')
+
+    newEmail = Message("0.txt")
+    doc = newEmail.getTokens()
+    print doc
+    vec_bow = dic.doc2bow(doc)
+    vec_lsi = lsi[vec_bow]
+    sims = index[vec_lsi]
+    sims = sorted(enumerate(sims), key=lambda item: -item[1])
+    for i in range(10):
+        print sims[i]
+
+    #msg = Message("/users/zschiller/desktop/trash/myEmails/email2287.txt")
+    #print msg.getBody()
+
+
     #corp = corpus_saved.getCorpus()
     #print corp
     #dic.BleiCorpus.serialize('/tmp/corpus.lda-c', corpus)
-    print dic
     #print keywords
     #dictionary = corpora.Dictionary(keywords)
     #corpus = [dictionary.doc2bow(keyword) for keyword in keywords]
     #print dictionary.token2id
     #print corpus
 
+## This function takes in the location of the email files
+## and finds the keywords from all of the fiels and saves
+## the corpus to a text file that can eb read later
 def createKeywordText(fileLoc, numFiles):
     saveCorpus = open('mycorpus.txt','w')
     messages = []
@@ -134,6 +163,22 @@ def splitEmails(filename, locToSave):
     print "Created " + str(count) + " files from emails."
     return listEmails
 
+def compareEmail(newEmailLoc):
+    newEmail = Message(newEmailLoc)
+    print newEmail.getTokens()
+
+def checkSimilarity(texts, doc):
+    dictionary = corpora.Dictionary(texts)
+    corpus = [dictionary.doc2bow(text) for text in texts]
+    lsi = models.LsiModel(corpus, id2word=dictionary, num_topics=2)
+
+    vec_bow = dictionary.doc2bow(doc)
+    vec_lsi = lsi[vec_bow]
+
+    index = similarities.MatrixSimilarity(lsi[corpus])
+    sims = index[vec_lsi]
+    sims = sorted(enumerate(sims), key=lambda item: -item[1])
+    return sims
 
 ## Run the main program
 if __name__ == '__main__':
