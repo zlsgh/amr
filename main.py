@@ -31,13 +31,14 @@ def main():
     # Uncomment to create keyword text
     #createKeywordText("/users/zschiller/desktop/myEmails/",17724)
     # uncomment to load from mycorpus.txt file
-    #corpus_saved = MyCorpus()
-    #corpus_saved.saveDic()
-    #corpus_saved.saveCorpus()
-    #dic = corpus_saved.getDictionary()
-    #corpus = corpus_saved.getCorpus()
-
-    corpus = corpora.MmCorpus('savedCorpus.mm')
+    '''
+    corpus_saved = MyCorpus()
+    corpus_saved.saveDic()
+    corpus_saved.saveCorpusLDA()
+    dic = corpus_saved.getDictionary()
+    corpus = corpus_saved.getCorpus()
+    '''
+    corpus = corpora.BleiCorpus('savedCorpus.lda-c')
     dic = corpora.Dictionary.load("savedDictionary.dict")
 
     lsi = models.LsiModel(corpus, id2word=dic, num_topics=2)
@@ -45,17 +46,25 @@ def main():
     index.save('saved.index')
     index = similarities.MatrixSimilarity.load('saved.index')
 
-    newEmail = Message("0.txt")
+    newEmail = Message("testemail2.txt")
     doc = newEmail.getTokens()
     print doc
     vec_bow = dic.doc2bow(doc)
     vec_lsi = lsi[vec_bow]
     sims = index[vec_lsi]
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
+    print "Closest Matches: "
     for i in range(10):
-        print sims[i]
+        if sims[i][1] == 1.0:
+            print "-----------------"
+            print "Email " + str(sims[i][0])
+            print "-----------------"
+            msg = Message("/users/zschiller/desktop/trash/myEmails/email"+str(sims[i][0])+".txt")
+            print msg.getBody()
 
-    #msg = Message("/users/zschiller/desktop/trash/myEmails/email2287.txt")
+        #print sims[i]
+
+    #msg = Message("/users/zschiller/desktop/trash/myEmails/email16950.txt")
     #print msg.getBody()
 
 

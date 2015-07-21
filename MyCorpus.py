@@ -51,8 +51,11 @@ class MyCorpus:
     def saveDic(self):
         self.dictionary.save('savedDictionary.dict')
 
-    def saveCorpus(self):
+    def saveCorpusMM(self):
         corpora.MmCorpus.serialize('savedCorpus.mm', self.corpus)
+
+    def saveCorpusLDA(self):
+        corpora.BleiCorpus.serialize('savedCorpus.lda-c', self.corpus)
 
 
 
