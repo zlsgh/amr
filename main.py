@@ -22,7 +22,10 @@ import email
 from email.parser import Parser
 from Message import Message
 from MyCorpus import MyCorpus
-from gensim import corpora, models, similarities
+from gensim import corpora, models, similarities, logging
+
+## Enable logging
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 ## Main program
 def main():
@@ -31,16 +34,24 @@ def main():
     # Uncomment to create keyword text
     #createKeywordText("/users/zschiller/desktop/myEmails/",17724)
     # uncomment to load from mycorpus.txt file
-    '''
-    corpus_saved = MyCorpus()
-    corpus_saved.saveDic()
-    corpus_saved.saveCorpusLDA()
-    dic = corpus_saved.getDictionary()
-    corpus = corpus_saved.getCorpus()
-    '''
+
+    #dic, corpus = createCorpus()
+
     corpus = corpora.BleiCorpus('savedCorpus.lda-c')
     dic = corpora.Dictionary.load("savedDictionary.dict")
 
+    tfidf = models.TfidfModel(corpus)
+    corpus_tfidf = tfidf[corpus]
+    #for doc in corpus_tfidf:
+    #    print(doc)
+    lsi = models.LsiModel(corpus_tfidf, id2word=dic, num_topics=2)
+    #model = ldamodel.LdaModel(bow_corpus, id2word=dic, num_topics=100)
+    corpus_lsi = lsi[corpus_tfidf]
+    lsi.print_topics(2)
+
+
+    ## Comparisons
+    '''
     lsi = models.LsiModel(corpus, id2word=dic, num_topics=2)
     index = similarities.MatrixSimilarity(lsi[corpus])
     index.save('saved.index')
@@ -53,9 +64,25 @@ def main():
     vec_lsi = lsi[vec_bow]
     sims = index[vec_lsi]
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
+    '''
+
+## This function creates a corpus and dictionary based on the texts kept in file
+def createCorpus():    
+    corpus_saved = MyCorpus()
+    corpus_saved.saveDic()
+    corpus_saved.saveCorpusLDA()
+    dic = corpus_saved.getDictionary()
+    corpus = corpus_saved.getCorpus()
+    return (dic,corpus)
+
+
+
+## This function displays the top matches from the similarities
+def displayMatches(sims):
     print "Closest Matches: "
     for i in range(10):
         if sims[i][1] == 1.0:
+            print sims[i]
             print "-----------------"
             print "Email " + str(sims[i][0])
             print "-----------------"
@@ -67,15 +94,6 @@ def main():
     #msg = Message("/users/zschiller/desktop/trash/myEmails/email16950.txt")
     #print msg.getBody()
 
-
-    #corp = corpus_saved.getCorpus()
-    #print corp
-    #dic.BleiCorpus.serialize('/tmp/corpus.lda-c', corpus)
-    #print keywords
-    #dictionary = corpora.Dictionary(keywords)
-    #corpus = [dictionary.doc2bow(keyword) for keyword in keywords]
-    #print dictionary.token2id
-    #print corpus
 
 ## This function takes in the location of the email files
 ## and finds the keywords from all of the fiels and saves
