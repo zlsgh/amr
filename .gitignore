@@ -1,0 +1,9 @@
+*.class
+*.swp
+*.pyc
+.DS_store
+.index
+.vocab
+.mm
+.dict
+.txt
