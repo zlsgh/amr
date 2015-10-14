@@ -1,5 +1,4 @@
 # !/usr/bin/python
-# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
 ################################  Information ################################
 ##
@@ -101,7 +100,6 @@ class Message:
                 signature = True
             #if parts[i].startswith('On '):
             #    possibleSig = True
-            #    possibleSigDelete = 1
             #elif (parts[i].endswith('wrote:') and possibleSig == True):
             #    signature = True
             #    print "LINE!!!" + str(possibleSigDelete)
@@ -143,4 +141,5 @@ class Message:
 #    main()
 
 ##
-######
+#####
+# !/usr/bin/python

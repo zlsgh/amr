@@ -1,5 +1,4 @@
-# !/usr/bin/python
-# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
+#!/usr/bin/env python
 
 ################################  Information ################################
 ##
@@ -25,7 +24,7 @@ from MyCorpus import MyCorpus
 from gensim import corpora, models, similarities, logging
 
 ## Enable logging
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+#logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 ## Main program
 def main():
