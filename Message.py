@@ -38,8 +38,19 @@ class Message:
         fp.close()
         headers = Parser().parse(open(self.fileLocation, 'U'))
         self.toAddress = headers['to']
+        #print self.toAddress
+        try:
+            if "'" in self.toAddress:
+                addressParts = self.toAddress.split("'")
+                self.toAddress = addressParts[1]
+        except:
+            print "Error with To Address"
+            self.error = True
         self.fromAddress = headers['from']
         self.subject = headers['subject']
+        self.date = headers['date']
+        if self.date == None:
+            self.date = headers['sent']
         for part in msg.walk():
             #print "-------------------"
             #print part.get_content_type()
@@ -49,7 +60,7 @@ class Message:
                 try:
                     self.findTokens()
                 except:
-                    print "Error!"
+                    print "Error making tokens"
                     self.error = True
                     self.tokens = []
                 hasBody = True
@@ -66,7 +77,7 @@ class Message:
         if self.subject is None or self.toAddress is None:
              tempBody = self.body
         else:
-            tempBody = self.body + self.toAddress+ '\n' + self.subject          
+            tempBody = self.body + self.toAddress + '\n' + self.subject          
         #print tempBody
         tempTokens = nltk.word_tokenize(tempBody)
         tempTokens = [w for w in tempTokens if (not w in punctuations and len(w)<50)]
@@ -123,6 +134,9 @@ class Message:
 
     def getSubject(self):
         return self.subject
+
+    def getDate(self):
+        return self.date
 
     def getBody(self):
         return self.body

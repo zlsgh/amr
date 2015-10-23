@@ -35,7 +35,11 @@ def main():
     # uncomment to load from mycorpus.txt file
 
     #dic, corpus = createCorpus()
+    #new = Message("C05759748.txt")
 
+    path = "/Users/zschiller/Desktop/fixed/"
+    testMessages(path+"C05758398.txt")
+    '''
     corpus = corpora.BleiCorpus('savedCorpus.lda-c')
     dic = corpora.Dictionary.load("savedDictionary.dict")
 
@@ -47,7 +51,7 @@ def main():
     #model = ldamodel.LdaModel(bow_corpus, id2word=dic, num_topics=100)
     corpus_lsi = lsi[corpus_tfidf]
     lsi.print_topics(2)
-
+    '''
 
     ## Comparisons
     '''
@@ -205,6 +209,23 @@ def checkSimilarity(texts, doc):
     sims = index[vec_lsi]
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
     return sims
+
+def testMessages(msg):
+    new = [Message(msg)]
+    for i in range(len(new)):
+        print "----------------------------------------------------"
+        print "TO--------------------------------------------------"
+        print new[i].getToAddress()
+        print "FROM------------------------------------------------"
+        print new[i].getFromAddress()
+        print "DATE------------------------------------------------"
+        print new[i].getDate()
+        print "SUBJECT---------------------------------------------"
+        print new[i].getSubject()
+        print "BODY------------------------------------------------"
+        print new[i].getBody()
+        print "TOKENS----------------------------------------------"
+        print new[i].getTokens()
 
 ## Run the main program
 if __name__ == '__main__':
