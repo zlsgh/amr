@@ -45,7 +45,7 @@ def convert(fileLocation):
             pass
         elif data[i][0:2] == "B5":
             pass
-        elif data[i][0:2] == "B5":
+        elif data[i][0:2] == "B6":
             pass
         else:
             fout.write(data[i]+'\n')
@@ -81,15 +81,19 @@ def convert(fileLocation):
 
 path = "/Users/zschiller/Desktop/hillary_text/"
 i = 0
+j=0
+l = len(os.listdir(path))
+
 for filename in os.listdir(path):
-    print "Working on", str(filename), '\n'
+    print "Working on", str(filename)
     if filename == ".DS_Store":
         pass
-    #elif i==5:
-        #break
+    elif j==10:
+        break
     else:
         result = convert(filename)
         if result:
-            i += 1
-            print "added"
-print "Errors = " + str(i)
+            j += 1
+    i += 1
+    print("completed "+str(i)+" of "+str(l)+'\n')
+print "Errors = " + str(j)

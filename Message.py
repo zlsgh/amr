@@ -39,13 +39,14 @@ class Message:
         headers = Parser().parse(open(self.fileLocation, 'U'))
         self.toAddress = headers['to']
         #print self.toAddress
-        try:
+        if self.toAddress != None:
             if "'" in self.toAddress:
-                addressParts = self.toAddress.split("'")
-                self.toAddress = addressParts[1]
-        except:
-            print "Error with To Address"
-            self.error = True
+                try:
+                    addressParts = self.toAddress.split("'")
+                    self.toAddress = addressParts[1]
+                except:
+                    print "Error with To Address"
+                    self.error = True
         self.fromAddress = headers['from']
         self.subject = headers['subject']
         self.date = headers['date']
@@ -58,29 +59,34 @@ class Message:
                 self.body = part.get_payload() # prints the raw text
                 self.stripSignature()
                 try:
-                    self.findTokens()
+                    self.findTokens(False)
                 except:
-                    print "Error making tokens"
-                    self.error = True
-                    self.tokens = []
+                    try:
+                        self.findTokens(True)
+                    except:
+                        print "Error making tokens"
+                        self.error = True
+                        self.tokens = []
                 hasBody = True
         if hasBody == False:
             self.body = ""
             self.findTokens()
     
-    def findTokens(self):
+    def findTokens(self,encode):
         stopwords = nltk.corpus.stopwords.words('english')
-        stopwords.append(u'http')
-        stopwords.append(u'https')
-        stopwords.append(u're')
+        addedStopWords = [u'http','http',u'https','https',u're','re',u'sent','sent',u'to','to',u'from','from',u'subject','subject','original',u'original',u'message','message','i',u'i','-from','--from',u'-from',u'--from']
         punctuations = list(string.punctuation)
         if self.subject is None or self.toAddress is None:
              tempBody = self.body
         else:
-            tempBody = self.body + self.toAddress + '\n' + self.subject          
+            tempBody = self.body + self.toAddress + '\n' + self.subject
+        if encode:
+            tempBody = tempBody.decode('utf-8',errors='ignore')
         #print tempBody
         tempTokens = nltk.word_tokenize(tempBody)
-        tempTokens = [w for w in tempTokens if (not w in punctuations and len(w)<50)]
+        tempTokens = [w.lower() for w in tempTokens if (not w in punctuations and len(w)<50)]
+        tempTokens = [w.lower() for w in tempTokens if not w in addedStopWords]
+        #print tempTokens
         self.tokens = [w.lower() for w in tempTokens if not w in stopwords]
 
     def stripSignature(self):
