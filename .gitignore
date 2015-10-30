@@ -7,4 +7,7 @@
 *.dict
 *.txt
 *.lda-c
+*.project
+*.pydevproject
+*.npy
 .DS_store

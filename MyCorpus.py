@@ -1,35 +1,28 @@
 # !/usr/bin/python
 
-################################  Information ################################
-##
-## Title: 
-##
-## Author: Zachery Schiller
-## Email: zacheryschiller@gmail.com
-## Github: https://github.com/zacheryschiller/
-## 
-##############################################################################
-
-###### 
-## 
-
-## Imports
-from math import *
-import nltk
-from nltk.corpus import stopwords
+'''
+My Corpus class used to create the gensim corpus from the token data tored in a corpus.txt file.
+'''
+# # Imports
+import codecs
 import email
 from email.parser import Parser
+from math import *
 import string
-from gensim import corpora, models, similarities
 
-## New instance of corpus gets the documents out of mycorpus.txt file
+from gensim import corpora, models, similarities
+import nltk
+from nltk.corpus import stopwords
+
+
+# # New instance of corpus gets the documents out of mycorpus.txt file
 class MyCorpus:
-    def __init__(self):
+    def __init__(self, corpusName):
         # Get documents out of mycorpus.txt file
-        self.documents = (line.lower().split() for line in open('mycorpus.txt'))
+        self.documents = (line.lower().split() for line in codecs.open(corpusName, mode='r', encoding='utf-8', errors='ignore'))
 
         # Create Dictionary from documents
-        self.dictionary = corpora.Dictionary(line.lower().split() for line in open('mycorpus.txt'))
+        self.dictionary = corpora.Dictionary(line.lower().split() for line in codecs.open(corpusName, mode='r', encoding='utf-8', errors='ignore'))
 
         # Filter out the keywords that are only in the corpus once
         once_ids = [tokenid for tokenid, docfreq in self.dictionary.dfs.iteritems() if docfreq == 1]
@@ -39,7 +32,7 @@ class MyCorpus:
         self.dictionary.compactify()
 
         self.corpus = [self.dictionary.doc2bow(doc) for doc in self.documents]
-        #self.corpus = [self.dictionary.doc2bow(text) for text in texts]
+        # self.corpus = [self.dictionary.doc2bow(text) for text in texts]
    
     def getDictionary(self):
         return self.dictionary
@@ -58,5 +51,5 @@ class MyCorpus:
 
 
 
-##
+# #
 ######

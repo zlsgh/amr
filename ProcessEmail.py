@@ -4,31 +4,32 @@ This class is designed to receive emails, add them to database,
 and send a response email out.
 '''
 
-import smtplib
-import imaplib
-import getpass
 from Message import Message
 import email
+import getpass
+import imaplib
+import smtplib
+
 
 class ProcessEmail:
 	def __init__(self):
 		self.login()
-		#print self.mail.list()
+		# print self.mail.list()
 		# Out: list of "folders" aka labels in gmail.
-		self.mail.select("inbox") # connect to inbox.
+		self.mail.select("inbox")  # connect to inbox.
 		result, data = self.mail.search(None, "ALL")
 
-		ids = data[0] # data is a list.
-		id_list = ids.split() # ids is a space separated string
-		latest_email_id = id_list[-1] # get the latest
+		ids = data[0]  # data is a list.
+		id_list = ids.split()  # ids is a space separated string
+		latest_email_id = id_list[-1]  # get the latest
 
 		# fetch the email body (RFC822) for the given ID
 		result, data = self.mail.fetch(latest_email_id, "(RFC822)") 
 		
 		msg = email.message_from_string(data[0][1])
-		#print msg
-		#raw_email = data[0][1] # here's the body, which is raw text of the whole email	
-		fout = open('lastEmail.txt','w')
+		# print msg
+		# raw_email = data[0][1] # here's the body, which is raw text of the whole email	
+		fout = open('lastEmail.txt', 'w')
 		fout.write(str(msg))
 		fout.close()
 		# including headers and alternate payloads

@@ -4,9 +4,9 @@
 Title: Email Archive Downloader
 '''
 
-## Imports
-import urllib2
+# # Imports
 import os
+import urllib2
 
 
 def main():
@@ -24,35 +24,35 @@ def main():
             print None
     print len(docNames)
 
-    #download_file("https://foia.state.gov/searchapp/" + docNames[0], docNames[0])
+    # download_file("https://foia.state.gov/searchapp/" + docNames[0], docNames[0])
     for i in xrange(len(docNames)):
-            print "Getting",i,"of",len(docNames)
+            print "Getting", i, "of", len(docNames)
             download_file("https://foia.state.gov/searchapp/" + docNames[i], docNames[i])
 
     #    dirs = docNames[i].split('/')
     #    print dirs    
     #
-    #dirName = "/users/zschiller/Desktop/hillary/"
-    #if not os.path.exists(dirName):
+    # dirName = "/users/zschiller/Desktop/hillary/"
+    # if not os.path.exists(dirName):
     #    os.makedirs(dirName)
     fin.close()
 
 def download_file(download_url, docName):
     dirs = docName.split('/')
-    dirName = "/users/zschiller/Desktop/hillary/"+dirs[1]+'/'+dirs[2]+'/'+dirs[3]+'/'
+    dirName = "/users/zschiller/Desktop/hillary/" + dirs[1] + '/' + dirs[2] + '/' + dirs[3] + '/'
     print dirName
     if not os.path.exists(dirName):
         os.makedirs(dirName)
-    newFileName = dirName+dirs[4]
+    newFileName = dirName + dirs[4]
     response = urllib2.urlopen(download_url)
     file = open(newFileName, 'w')
     file.write(response.read())
     file.close()
     print("Completed")
 
-## Run the main program
+# # Run the main program
 if __name__ == '__main__':
     main()
 
-##
+# #
 ######

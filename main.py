@@ -1,59 +1,65 @@
 #!/usr/bin/env python
+'''
+Main program that runs to process email, create dictionaries and corpuses and cehcks similarity matching
+'''
 
-################################  Information ################################
-##
-## Title: Auto Mail Reply (amr) 
-##
-## Author: Zachery Schiller
-## Email: zacheryschiller@gmail.com
-## Github: https://github.com/zacheryschiller/
-## 
-##############################################################################
- 
-###### 
-## 
-
-## Imports
-## These are the imports needed to run the program, including GenSim
-from math import *
-import nltk
+from Message import Message
 import email
 from email.parser import Parser
-from Message import Message
-from MyCorpus import MyCorpus
+import math
+import os
+
 from gensim import corpora, models, similarities, logging
+import nltk
 
-## Enable logging
-#logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+from MyCorpus import MyCorpus
+from gensim.corpora.dictionary import Dictionary
 
-## Main program
+
 def main():
+    
+    ''' Uncomment to enable GenSim's logging '''
+    # logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-    #Good Stuff
-    # Uncomment to create keyword text
-    #createKeywordText("/users/zschiller/desktop/myEmails/",17724)
-    # uncomment to load from mycorpus.txt file
+    # Uncomment for main program
+    messages = createKeywordText("/Users/zschiller/Desktop/fixed/","ClintonCorpus.txt")
+    dic, corpus = createCorpus("ClintonCorpus.txt")
+    
+    tfidf = models.TfidfModel(corpus)
+    corpus_tfidf = tfidf[corpus]
+    
+    # Create Index
+    #index = similarities.MatrixSimilarity(tfidf[corpus])
+    #index.save("ClintonIndexTFIDF.index")
+    index = similarities.MatrixSimilarity.load("ClintonIndexTFIDF.index")
+    # Similarity check against query
+    query = "benghazi  libya attack"
+    vec_bow = dic.doc2bow(query.lower().split())
+    vec_tfidf = tfidf[vec_bow]
+    sims = index[vec_tfidf]
+    sims = sorted(enumerate(sims), key=lambda item:-item[1])
+    match = sims[0][0]
+    print messages[match].getBody()
+    
+    
+    # for doc in corpus_tfidf:
+    #    print(doc)
 
-    #dic, corpus = createCorpus()
-    #new = Message("C05759748.txt")
 
+    '''
     path = "/Users/zschiller/Desktop/fixed/"
     testMessages(path+"C05758398.txt")
-    '''
     corpus = corpora.BleiCorpus('savedCorpus.lda-c')
     dic = corpora.Dictionary.load("savedDictionary.dict")
 
-    tfidf = models.TfidfModel(corpus)
-    corpus_tfidf = tfidf[corpus]
-    #for doc in corpus_tfidf:
-    #    print(doc)
+
     lsi = models.LsiModel(corpus_tfidf, id2word=dic, num_topics=2)
     #model = ldamodel.LdaModel(bow_corpus, id2word=dic, num_topics=100)
     corpus_lsi = lsi[corpus_tfidf]
     lsi.print_topics(2)
     '''
 
-    ## Comparisons
+    # # Comparisons
     '''
     lsi = models.LsiModel(corpus, id2word=dic, num_topics=2)
     index = similarities.MatrixSimilarity(lsi[corpus])
@@ -69,18 +75,18 @@ def main():
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
     '''
 
-## This function creates a corpus and dictionary based on the texts kept in file
-def createCorpus():    
-    corpus_saved = MyCorpus()
+# # This function creates a corpus and dictionary based on the texts kept in file
+def createCorpus(corpusName):    
+    corpus_saved = MyCorpus(corpusName)
     corpus_saved.saveDic()
-    corpus_saved.saveCorpusLDA()
+    # corpus_saved.saveCorpusLDA()
     dic = corpus_saved.getDictionary()
     corpus = corpus_saved.getCorpus()
-    return (dic,corpus)
+    return (dic, corpus)
 
 
 
-## This function displays the top matches from the similarities
+# # This function displays the top matches from the similarities
 def displayMatches(sims):
     print "Closest Matches: "
     for i in range(10):
@@ -89,48 +95,50 @@ def displayMatches(sims):
             print "-----------------"
             print "Email " + str(sims[i][0])
             print "-----------------"
-            msg = Message("/users/zschiller/desktop/trash/myEmails/email"+str(sims[i][0])+".txt")
+            msg = Message("/users/zschiller/desktop/trash/myEmails/email" + str(sims[i][0]) + ".txt")
             print msg.getBody()
 
-        #print sims[i]
+        # print sims[i]
 
-    #msg = Message("/users/zschiller/desktop/trash/myEmails/email16950.txt")
-    #print msg.getBody()
+    # msg = Message("/users/zschiller/desktop/trash/myEmails/email16950.txt")
+    # print msg.getBody()
 
 
-## This function takes in the location of the email files
-## and finds the keywords from all of the fiels and saves
-## the corpus to a text file that can eb read later
-def createKeywordText(fileLoc, numFiles):
-    saveCorpus = open('mycorpus.txt','w')
+# # This function takes in the location of the email files
+# # and finds the keywords from all of the files and saves
+# # the corpus to a text file that can eb read later
+def createKeywordText(path, corpusName):
+    saveCorpus = open(corpusName, 'w')
     messages = []
-    keywords = []
-    numErrors = 0
-    for i in range(numFiles):
-        fn = fileLoc + "email" + str(i) + ".txt"
-        #print fn
-        messages.append(Message(fn))
-        if messages[i].getError():
-            numErrors +=1
-        l = ' '.join(map(str,messages[i].getTokens()))
-        saveCorpus.write(l+'\n')
-        print "Done " + str(i) + " of " + str(numFiles-1)
-        #keywords.append(messages[i].getTokens())
-        #print "______________BODY______________"
-        #print messages[0].getBody()
-        #print  "______________Keywords______________"
-        #print messages[i].getTokens()
-        #print l
-        #fout = "/users/zschiller/desktop/myEmailsTokens/email" + str(i) + "_tokens.txt"
-        #w = open(fout,'w')
-        #w.write(l)
-        #w.close()
-    saveCorpus.close()
-    print "Created corpus file with only " + str(numErrors) + " errors!"
+    i = 0
+    errors = 0
+    l = len(os.listdir(path))
 
-## Get initial information from the user about haivng a .mbox
-## or where the email files are stored. Then runs the setup process
-## finally returning the list of locations where the emails are
+    for filename in os.listdir(path):
+        print "Working on", str(filename)
+        if filename == ".DS_Store":
+            pass
+        elif errors == 10:
+            print "More than 10 errors. Stopping."
+            break
+        else:
+            new = Message(path + filename)
+            messages.append(new)
+            result = new.getError()
+            tokens = ' '.join(map(str, messages[i].getTokens()))
+            saveCorpus.write(tokens + '\n')
+
+            if result:
+                errors += 1
+        i += 1
+        print("Completed " + str(i) + " of " + str(l) + '\n')
+    saveCorpus.close()
+    print "Errors = " + str(errors)
+    return messages
+
+# # Get initial information from the user about haivng a .mbox
+# # or where the email files are stored. Then runs the setup process
+# # finally returning the list of locations where the emails are
 def getInfo():
     print "This program tells you which emails are similar to one another."
     mbox = 'i'
@@ -140,7 +148,7 @@ def getInfo():
         if mbox == 'y':
             fileLoc = raw_input(("Please enter the location and name of your "
             ".mbox file (ex: /users/you/Downlods/myEmails.mbox): "))
-            locToSave =  raw_input(("Please enter the location that you "
+            locToSave = raw_input(("Please enter the location that you "
             "would like to save these emails "
             "(ex: /users/you/Documents/myEmails/): "))
             cont = raw_input(("Are you sure you want to use your .mbox? This "
@@ -164,11 +172,11 @@ def getInfo():
     for i in range(int(numEmails)):
         print "checking " + str(i)
         name = fileNames[:dot] + str(i)
-        listEmails.append(fileLoc+fileNames[:dot]+str(i)+fileNames[dot:])
+        listEmails.append(fileLoc + fileNames[:dot] + str(i) + fileNames[dot:])
     return listEmails
 
-## Split .mbox into individual files
-## Careful as this does make a lot of files...
+# # Split .mbox into individual files
+# # Careful as this does make a lot of files...
 def splitEmails(filename, locToSave):
     fin = open(filename, 'r')
     data = fin.readlines()
@@ -176,15 +184,15 @@ def splitEmails(filename, locToSave):
     start = True
     for line in data:
         if start == True:
-            name = locToSave+'email0.txt'
+            name = locToSave + 'email0.txt'
             listEmails.append(name)
             fout = open(name, 'w')
             count = 0
             start = False
         elif (line[:5] == "From "):
-            count = count+1
+            count = count + 1
             fout.close()
-            name = locToSave+'email'+str(count)+'.txt'
+            name = locToSave + 'email' + str(count) + '.txt'
             listEmails.append(name)
             fout = open(name, 'w')
         fout.write(line)
@@ -207,7 +215,7 @@ def checkSimilarity(texts, doc):
 
     index = similarities.MatrixSimilarity(lsi[corpus])
     sims = index[vec_lsi]
-    sims = sorted(enumerate(sims), key=lambda item: -item[1])
+    sims = sorted(enumerate(sims), key=lambda item:-item[1])
     return sims
 
 def testMessages(msg):
@@ -227,9 +235,9 @@ def testMessages(msg):
         print "TOKENS----------------------------------------------"
         print new[i].getTokens()
 
-## Run the main program
+# # Run the main program
 if __name__ == '__main__':
-    #getInfo()
+    # getInfo()
     main()
-##
+# #
 ######
