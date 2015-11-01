@@ -4,33 +4,52 @@ Main program that runs to process email, create dictionaries and corpuses and ce
 '''
 
 from Message import Message
+import codecs
 import email
 from email.parser import Parser
 import math
 import os
 
 from gensim import corpora, models, similarities, logging
+from gensim.corpora.dictionary import Dictionary
 import nltk
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import linear_kernel
 
 from MyCorpus import MyCorpus
-from gensim.corpora.dictionary import Dictionary
 
 
 def main():
     
     ''' Uncomment to enable GenSim's logging '''
     # logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+    
+    # messages = createKeywordText("/Users/zschiller/Desktop/fixed/", "ClintonCorpus.txt")
+    documents = (line.lower().split() for line in codecs.open("ClintonCorpus.txt", mode='r', encoding='utf-8', errors='ignore'))
+    modified_doc = [' '.join(i) for i in documents]
+    tf_idf = TfidfVectorizer().fit_transform(modified_doc)
+    cosine_similarities = linear_kernel(tf_idf[0:1], tf_idf).flatten()
+    related_docs_indices = cosine_similarities.argsort()[:-5:-1]
+    print related_docs_indices
+    print cosine_similarities[related_docs_indices]
+    fin = open("indexClintonCorpus.txt", 'r')
+    data = fin.readlines()
+    print data[1075]
+    new = Message("/Users/zschiller/Desktop/fixed/" + data[1075].strip())
+    print new.getBody()
+    fin.close()
+    
 
-    # Uncomment for main program
-    messages = createKeywordText("/Users/zschiller/Desktop/fixed/","ClintonCorpus.txt")
+    '''
+    messages = createKeywordText("/Users/zschiller/Desktop/fixed/", "ClintonCorpus.txt")
     dic, corpus = createCorpus("ClintonCorpus.txt")
     
     tfidf = models.TfidfModel(corpus)
     corpus_tfidf = tfidf[corpus]
     
     # Create Index
-    #index = similarities.MatrixSimilarity(tfidf[corpus])
-    #index.save("ClintonIndexTFIDF.index")
+    # index = similarities.MatrixSimilarity(tfidf[corpus])
+    # index.save("ClintonIndexTFIDF.index")
     index = similarities.MatrixSimilarity.load("ClintonIndexTFIDF.index")
     # Similarity check against query
     query = "benghazi  libya attack"
@@ -40,10 +59,8 @@ def main():
     sims = sorted(enumerate(sims), key=lambda item:-item[1])
     match = sims[0][0]
     print messages[match].getBody()
+    '''
     
-    
-    # for doc in corpus_tfidf:
-    #    print(doc)
 
 
     '''
@@ -109,6 +126,7 @@ def displayMatches(sims):
 # # the corpus to a text file that can eb read later
 def createKeywordText(path, corpusName):
     saveCorpus = open(corpusName, 'w')
+    saveCorpusIndex = open("index" + corpusName, 'w')
     messages = []
     i = 0
     errors = 0
@@ -127,12 +145,14 @@ def createKeywordText(path, corpusName):
             result = new.getError()
             tokens = ' '.join(map(str, messages[i].getTokens()))
             saveCorpus.write(tokens + '\n')
+            saveCorpusIndex.write(filename + '\n')
 
             if result:
                 errors += 1
         i += 1
         print("Completed " + str(i) + " of " + str(l) + '\n')
     saveCorpus.close()
+    saveCorpusIndex.close()
     print "Errors = " + str(errors)
     return messages
 
