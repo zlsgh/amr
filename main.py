@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Main program that runs to process email, create dictionaries and corpuses and cehcks similarity matching
+Main program that runs to process email, create dictionaries and corpuses and checks similarity matching
 '''
 
 from Message import Message
@@ -25,53 +25,17 @@ def main():
     # logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     
     # messages = createKeywordText("/Users/zschiller/Desktop/fixed/", "ClintonCorpus.txt")
-    documents = (line.lower().split() for line in codecs.open("ClintonCorpus.txt", mode='r', encoding='utf-8', errors='ignore'))
-    modified_doc = [' '.join(i) for i in documents]
-    tf_idf = TfidfVectorizer().fit_transform(modified_doc)
-    cosine_similarities = linear_kernel(tf_idf[0:1], tf_idf).flatten()
-    related_docs_indices = cosine_similarities.argsort()[:-5:-1]
-    print related_docs_indices
-    print cosine_similarities[related_docs_indices]
-    fin = open("indexClintonCorpus.txt", 'r')
-    data = fin.readlines()
-    print data[1075]
-    new = Message("/Users/zschiller/Desktop/fixed/" + data[1075].strip())
-    print new.getBody()
-    fin.close()
-    
 
-    '''
-    messages = createKeywordText("/Users/zschiller/Desktop/fixed/", "ClintonCorpus.txt")
-    dic, corpus = createCorpus("ClintonCorpus.txt")
-    
-    tfidf = models.TfidfModel(corpus)
-    corpus_tfidf = tfidf[corpus]
-    
-    # Create Index
-    # index = similarities.MatrixSimilarity(tfidf[corpus])
-    # index.save("ClintonIndexTFIDF.index")
-    index = similarities.MatrixSimilarity.load("ClintonIndexTFIDF.index")
-    # Similarity check against query
-    query = "benghazi  libya attack"
-    vec_bow = dic.doc2bow(query.lower().split())
-    vec_tfidf = tfidf[vec_bow]
-    sims = index[vec_tfidf]
-    sims = sorted(enumerate(sims), key=lambda item:-item[1])
-    match = sims[0][0]
-    print messages[match].getBody()
-    '''
-    
-
-
+    sciKitCheck()
     '''
     path = "/Users/zschiller/Desktop/fixed/"
-    testMessages(path+"C05758398.txt")
+    testMessages(path + "C05758398.txt")
     corpus = corpora.BleiCorpus('savedCorpus.lda-c')
     dic = corpora.Dictionary.load("savedDictionary.dict")
 
 
     lsi = models.LsiModel(corpus_tfidf, id2word=dic, num_topics=2)
-    #model = ldamodel.LdaModel(bow_corpus, id2word=dic, num_topics=100)
+    # model = ldamodel.LdaModel(bow_corpus, id2word=dic, num_topics=100)
     corpus_lsi = lsi[corpus_tfidf]
     lsi.print_topics(2)
     '''
@@ -91,6 +55,42 @@ def main():
     sims = index[vec_lsi]
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
     '''
+    
+def sciKitCheck():
+    documents = (line.lower().split() for line in codecs.open("ClintonCorpus.txt", mode='r', encoding='utf-8', errors='ignore'))
+    modified_doc = [' '.join(i) for i in documents]
+    tf_idf = TfidfVectorizer().fit_transform(modified_doc)
+    cosine_similarities = linear_kernel(tf_idf[0:1], tf_idf).flatten()
+    related_docs_indices = cosine_similarities.argsort()[:-5:-1]
+    print related_docs_indices
+    print cosine_similarities[related_docs_indices]
+    fin = open("indexClintonCorpus.txt", 'r')
+    data = fin.readlines()
+    print data[1075]
+    new = Message("/Users/zschiller/Desktop/Clinton/" + data[1075].strip())
+    print new.getBody()
+    fin.close()
+    
+def genSimCheck():
+
+    messages = createKeywordText("/Users/zschiller/Desktop/fixed/", "ClintonCorpus.txt")
+    dic, corpus = createCorpus("ClintonCorpus.txt")
+    
+    tfidf = models.TfidfModel(corpus)
+    corpus_tfidf = tfidf[corpus]
+    
+    # Create Index
+    # index = similarities.MatrixSimilarity(tfidf[corpus])
+    # index.save("ClintonIndexTFIDF.index")
+    index = similarities.MatrixSimilarity.load("ClintonIndexTFIDF.index")
+    # Similarity check against query
+    query = "benghazi  libya attack"
+    vec_bow = dic.doc2bow(query.lower().split())
+    vec_tfidf = tfidf[vec_bow]
+    sims = index[vec_tfidf]
+    sims = sorted(enumerate(sims), key=lambda item:-item[1])
+    match = sims[0][0]
+    print messages[match].getBody()
 
 # # This function creates a corpus and dictionary based on the texts kept in file
 def createCorpus(corpusName):    
