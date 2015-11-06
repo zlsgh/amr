@@ -19,10 +19,10 @@ from nltk.corpus import stopwords
 class MyCorpus:
     def __init__(self, corpusName):
         # Get documents out of mycorpus.txt file
-        self.documents = (line.lower().split() for line in codecs.open(corpusName, mode='r', encoding='utf-8', errors='ignore'))
+        self.documents = (line.lower().split() for line in codecs.open(corpusName + ".txt", mode='r', encoding='utf-8', errors='ignore'))
 
         # Create Dictionary from documents
-        self.dictionary = corpora.Dictionary(line.lower().split() for line in codecs.open(corpusName, mode='r', encoding='utf-8', errors='ignore'))
+        self.dictionary = corpora.Dictionary(line.lower().split() for line in codecs.open(corpusName + ".txt", mode='r', encoding='utf-8', errors='ignore'))
 
         # Filter out the keywords that are only in the corpus once
         once_ids = [tokenid for tokenid, docfreq in self.dictionary.dfs.iteritems() if docfreq == 1]

@@ -1,19 +1,6 @@
 # !/usr/bin/python
 
-################################  Information ################################
-# #
-# # Title: 
-# #
-# # Author: Zachery Schiller
-# # Email: zacheryschiller@gmail.com
-# # Github: https://github.com/zacheryschiller/
-# # 
-##############################################################################
-
-###### 
-# # 
-
-# # Imports
+''' Testing using GenSim utility '''
 import logging
 from math import *
 
