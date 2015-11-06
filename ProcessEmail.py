@@ -33,28 +33,29 @@ class ProcessEmail:
 		fout.write(str(msg))
 		fout.close()
 		# including headers and alternate payloads
+		self.send()
+		
+	def send(self):
+		server = 'smtp.gmail.com'
 
-		'''
-		server = 'mail.server.com'
-		user = ''
-		password = ''
-
-		recipients = ['user@mail.com', 'other@mail.com']
-		sender = 'you@mail.com'
-		message = 'Hello World'listen for new messages in a loop.
+		recipients = ['zacheryschiller@gmail.com', 'scarlettdom@gmail.com']
+		sender = 'zacheryschiller@gmail.com'
+		message = 'This is a test email'
+		# listen for new messages in a loop.
 
 		session = smtplib.SMTP(server)
+		session.ehlo()
+		session.starttls()
 		# if your SMTP server doesn't need authentications,
 		# you don't need the following line:
-		session.login(user, password)
+		session.login(self.user, self.pswd)
 		session.sendmail(sender, recipients, message)
-		'''
+
 	def login(self):
-		user = getpass.getuser("Please enter your email address:")
-		pswd = getpass.getpass("Please enter your password:")
+		self.user = "zacheryschiller@gmail.com"  # getpass.getuser()#"Please enter your email address:")
+		self.pswd = getpass.getpass("Please enter your password:")
 		self.mail = imaplib.IMAP4_SSL('imap.gmail.com')
-		self.mail.login(user, pswd)
-		pswd = None
+		self.mail.login(self.user, self.pswd)
 
 if __name__ == '__main__':
 	proc = ProcessEmail()

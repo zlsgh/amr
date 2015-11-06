@@ -26,7 +26,9 @@ def main():
     
     # messages = createKeywordText("/Users/zschiller/Desktop/fixed/", "ClintonCorpus.txt")
 
-    sciKitCheck()
+    # sciKitCheck()
+    genSimCheck()
+    
     '''
     path = "/Users/zschiller/Desktop/fixed/"
     testMessages(path + "C05758398.txt")
@@ -72,19 +74,20 @@ def sciKitCheck():
     fin.close()
     
 def genSimCheck():
-
-    messages = createKeywordText("/Users/zschiller/Desktop/fixed/", "ClintonCorpus.txt")
-    dic, corpus = createCorpus("ClintonCorpus.txt")
+    path = "/Users/zschiller/Desktop/email/"
+    corpusSave = "ZackCorpus.txt"
+    messages = createKeywordText(path, corpusSave)
+    dic, corpus = createCorpus(corpusSave)
     
     tfidf = models.TfidfModel(corpus)
     corpus_tfidf = tfidf[corpus]
     
     # Create Index
-    # index = similarities.MatrixSimilarity(tfidf[corpus])
-    # index.save("ClintonIndexTFIDF.index")
-    index = similarities.MatrixSimilarity.load("ClintonIndexTFIDF.index")
+    index = similarities.MatrixSimilarity(tfidf[corpus])
+    index.save("ZackIndexTFIDF.index")
+    # index = similarities.MatrixSimilarity.load("ClintonIndexTFIDF.index")
     # Similarity check against query
-    query = "benghazi  libya attack"
+    query = "what ip address"
     vec_bow = dic.doc2bow(query.lower().split())
     vec_tfidf = tfidf[vec_bow]
     sims = index[vec_tfidf]
@@ -254,6 +257,38 @@ def testMessages(msg):
         print new[i].getBody()
         print "TOKENS----------------------------------------------"
         print new[i].getTokens()
+
+def splitMultiMbox(path, locToSave):
+    ''' Funtion to split multiple .mbox files up into individual files '''
+    count = 0
+    i = 0
+    l = len(os.listdir(path))
+    for filename in os.listdir(path):
+        print "Working on", str(filename)
+        if filename == ".DS_Store":
+            pass
+        else:
+            fin = open(path + filename, 'r')
+            data = fin.readlines()
+            start = True
+            for line in data:
+                if start == True:
+                    name = locToSave + 'email' + str(count) + '.txt'
+                    fout = open(name, 'w')
+                    start = False
+                elif (line[:5] == "From "):
+                    count = count + 1
+                    fout.close()
+                    name = locToSave + 'email' + str(count) + '.txt'
+                    fout = open(name, 'w')
+                fout.write(line)
+            fout.close()
+            fin.close()
+            print "Created " + str(count) + " files from emails."
+        i += 1
+        print("Completed " + str(i) + " of " + str(l) + '\n')
+    return True
+
 
 # # Run the main program
 if __name__ == '__main__':
