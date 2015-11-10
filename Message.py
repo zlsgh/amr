@@ -1,31 +1,22 @@
 # !/usr/bin/python
 
-################################  Information ################################
-# #
-# # Title: 
-# #
-# # Author: Zachery Schiller
-# # Email: zacheryschiller@gmail.com
-# # Github: https://github.com/zacheryschiller/
-# # 
-##############################################################################
-
-###### 
-# # 
-
-# # Imports
+'''
+This is the Message Class which uses the NLTK and Email
+libraries to create a message for an email with
+important data extracted so that it can be recalled
+'''
 import email
 from email.parser import Parser
-from math import *
+
 import string
 
 import nltk
 from nltk.corpus import stopwords
 
 
-# # Main program
 class Message:
     """ Message class for each message in user database """
+
     def __init__(self, fileLocation):
         self.fileLocation = fileLocation
         self.error = False
@@ -40,7 +31,7 @@ class Message:
         headers = Parser().parse(open(self.fileLocation, 'U'))
         self.toAddress = headers['to']
         # print self.toAddress
-        if self.toAddress != None:
+        if self.toAddress is not None:
             if "'" in self.toAddress:
                 try:
                     addressParts = self.toAddress.split("'")
@@ -51,7 +42,7 @@ class Message:
         self.fromAddress = headers['from']
         self.subject = headers['subject']
         self.date = headers['date']
-        if self.date == None:
+        if self.date is not None:
             self.date = headers['sent']
         for part in msg.walk():
             # print "-------------------"
@@ -69,26 +60,33 @@ class Message:
                         self.error = True
                         self.tokens = []
                 hasBody = True
-        if hasBody == False:
+        if not hasBody:
             self.body = ""
             self.findTokens(False)
-            
+
     def findTokens(self, encode):
         stopwords = nltk.corpus.stopwords.words('english')
-        addedStopWords = [u'http', 'http', u'https', 'https', u're', 're', u'sent', 'sent', u'to', 'to', u'from', 'from', u'subject', 'subject', 'original', u'original', u'message', 'message', 'i', u'i', '-from', '--from', u'-from', u'--from', '-original', '--original', u'-origina', u'--original']
+        addedStopWords = [u'http', 'http', u'https', 'https', u're', 're',
+                          u'sent', 'sent', u'to', 'to', u'from', 'from',
+                          u'subject', 'subject', 'original',
+                          u'original', u'message', 'message', 'i', u'i',
+                          '-from', '--from', u'-from', u'--from', '-original',
+                          '--original', u'-origina', u'--original']
         punctuations = list(string.punctuation)
         if self.subject is None or self.toAddress is None:
-             tempBody = self.body
+            tempBody = self.body
         else:
             tempBody = self.body + self.toAddress + '\n' + self.subject
         if encode:
-            tempBody = tempBody.decode('ascii', errors='ignore')  # 'utf-8', errors='ignore')
+            # 'utf-8', errors='ignore')
+            tempBody = tempBody.decode('ascii', errors='ignore')
         # print tempBody
         tempTokens = nltk.word_tokenize(tempBody)
-        tempTokens = [w.lower() for w in tempTokens if (not w in punctuations and len(w) < 50)]
-        tempTokens = [w.lower() for w in tempTokens if not w in addedStopWords]
+        tempTokens = [w.lower() for w in tempTokens if (
+            w not in punctuations and len(w) < 50)]
+        tempTokens = [w.lower() for w in tempTokens if w not in addedStopWords]
         # print tempTokens
-        self.tokens = [w.lower() for w in tempTokens if not w in stopwords]
+        self.tokens = [w.lower() for w in tempTokens if w not in stopwords]
 
     def stripSignature(self):
         signature = False
@@ -98,19 +96,19 @@ class Message:
         # print parts
         newBody = ""
         for i in range(len(parts)):
-            if (parts[i] == '-- ' or 
-                    parts[i] == '--' or 
-                    parts[i] == '-----original message-----' or 
+            if (parts[i] == '-- ' or
+                    parts[i] == '--' or
+                    parts[i] == '-----original message-----' or
                     parts[i] == '________________________________'or
-                    parts[i] == 'sent from my iphone' or 
+                    parts[i] == 'sent from my iphone' or
                     parts[i] == 'sent from my blackberry' or
                     parts[i].startswith('> ') or
-                    parts[i].startswith('On Mon,') or 
-                    parts[i].startswith('On Tue,') or 
-                    parts[i].startswith('On Wed,') or 
-                    parts[i].startswith('On Thu,') or 
-                    parts[i].startswith('On Fri,') or 
-                    parts[i].startswith('On Sat,') or 
+                    parts[i].startswith('On Mon,') or
+                    parts[i].startswith('On Tue,') or
+                    parts[i].startswith('On Wed,') or
+                    parts[i].startswith('On Thu,') or
+                    parts[i].startswith('On Fri,') or
+                    parts[i].startswith('On Sat,') or
                     parts[i].startswith('On Sun,')):
                 # print "SIG!!!!!"
                 signature = True
@@ -123,13 +121,13 @@ class Message:
             #    print "LINE!!!" + str(possibleSigDelete)
             # elif possibleSig == True:
             #    possibleSigDelete += 1
-            if signature == False:
+            if not signature:
                 newBody = newBody + str(parts[i]) + "\n"
         self.body = newBody
         # print "-----"
         # print self.body
         # print "-----"
- 
+
     def getFileLocation(self):
         return self.fileLocation
 
@@ -156,11 +154,3 @@ class Message:
 
     def getError(self):
         return self.error
-
-# # Run the main program
-# if __name__ == '__main__':
-#    main()
-
-# #
-#####
-# !/usr/bin/python

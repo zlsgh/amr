@@ -31,7 +31,8 @@ print cosine_similarities[related_docs_indices]
 
 '''
 train_set = ("The sky is blue.", "The sun is bright.")
-test_set = ("The sun in the sky is bright.", "We can see the shining sun, the bright sun.")
+test_set = ("The sun in the sky is bright.",
+    "We can see the shining sun, the bright sun.")
 count_vectorizer = CountVectorizer()
 count_vectorizer.fit_transform(train_set)
 print "Vocabulary:", count_vectorizer.vocabulary

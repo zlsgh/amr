@@ -1,7 +1,8 @@
 # !/usr/bin/python
 
 '''
-This program is used to convert Secretary Clinton's emails into the standard format for use with the standard AMR project.
+This program is used to convert Secretary Clinton's emails into the standard
+format for use with the standard AMR project.
 '''
 from Message import Message
 import email
@@ -19,7 +20,7 @@ def convert(fileLocation):
     data = fin.read()
     fin.close()
 
-    # Formatting for messups in conversion    
+    # Formatting for messups in conversion
     data = data.replace(" From:", "\nFrom:")
     data = data.replace(" Sent:", "\nSent:")
     data = data.replace(" To:", "\nTo:")
@@ -52,29 +53,29 @@ def convert(fileLocation):
             fout.write(data[i] + '\n')
     fout.close()
 
-
     new = Message("/Users/zschiller/Desktop/fixed/" + fileLocation)
     if new.getError():
         fout2 = open(("/Users/zschiller/Desktop/errors/" + fileLocation), 'w')
     else:
-        fout2 = open(("/Users/zschiller/Desktop/fixedMessages/" + fileLocation), 'w')
-    if  (new.getToAddress() != None):
+        fout2 = open(
+            ("/Users/zschiller/Desktop/fixedMessages/" + fileLocation), 'w')
+    if (new.getToAddress() != None):
         fout2.write("----------------------------------------------------\n")
         fout2.write("TO--------------------------------------------------\n")
         fout2.write(new.getToAddress() + '\n')
-    if  (new.getFromAddress() != None):
+    if (new.getFromAddress() != None):
         fout2.write("FROM------------------------------------------------\n")
         fout2.write(new.getFromAddress() + '\n')
-    if  (new.getDate() != None):
+    if (new.getDate() != None):
         fout2.write("DATE------------------------------------------------\n")
         fout2.write(new.getDate() + '\n')
-    if  (new.getSubject() != None):
+    if (new.getSubject() != None):
         fout2.write("SUBJECT---------------------------------------------\n")
         fout2.write(new.getSubject() + '\n')
-    if  (new.getBody() != None):
+    if (new.getBody() != None):
         fout2.write("BODY------------------------------------------------\n")
         fout2.write(new.getBody() + '\n')
-    if  (new.getTokens() != None):
+    if (new.getTokens() != None):
         fout2.write("TOKENS----------------------------------------------\n")
         fout2.write(str(new.getTokens()) + '\n')
     fout2.close()
