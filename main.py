@@ -77,7 +77,7 @@ def genSimCheck(path, corpusName, query):
         matchLocation = sims[0][0]
         return getMatch(matchLocation, path, corpusName), sims[0][1]
     else:
-        return None
+        return None, None
 
 
 def createCorpus(corpusName):

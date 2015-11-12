@@ -34,16 +34,24 @@ class ProcessEmail:
             msgSubject = msg['subject']
             msgFrom = msg['from']
             if (("zacheryschiller@gmail.com" not in msgFrom) and
-                    ("AMR Response:" not in msgSubject)):
+                    ("AMR Response:" not in msgSubject) and
+                    (last_email_id != latest_email_id)):
+                last_email_id = latest_email_id
                 # fetch the email body (RFC822) for the given ID
                 msg = email.message_from_string(data[0][1])
                 fout = open('lastEmail.txt', 'w')
                 fout.write(str(msg))
                 fout.close()
-                self.createResponse()
+                replied = self.createResponse()
+                if replied:
+                    print ("The time is " + str(time.strftime("%I:%M:%S")) +
+                           ". AMR response created and sent.")
+                else:
+                    print ("The time is " + str(time.strftime("%I:%M:%S")) +
+                           ". AMR match percentage is too low to send.")
             else:
-                print "The time is " + str(time.strftime("%I:%M:%S"))
-                + ". No new mail. Will check again in 30 seconds."
+                print ("The time is " + str(time.strftime("%I:%M:%S")) +
+                       ". No new mail. Will check again in 30 seconds.")
             time.sleep(30)
 
     def send(self, message, subject):
@@ -76,6 +84,7 @@ class ProcessEmail:
         print "Incoming Mail: " + '\n' + new.getBody()
         subject = new.getSubject()
         subject = "AMR Response: " + subject
+        print new.getBody()
         reply, accuracy = genSimCheck(
             "/Users/zschiller/Desktop/PersonalEmails/",
             "ZackCorpus", new.getBody())
@@ -83,6 +92,8 @@ class ProcessEmail:
             print "Outgoing Mail: " + '\n' + reply
             reply = "Accuracy = " + accuracy + '\n' + reply
             self.send(reply, subject)
+            return True
+        return False
 
 if __name__ == '__main__':
     proc = ProcessEmail()
