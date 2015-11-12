@@ -81,19 +81,32 @@ class ProcessEmail:
     def createResponse(self):
         ''' Get response from similarity check. If good, send reply '''
         new = Message('lastEmail.txt')
-        print "Incoming Mail: " + '\n' + new.getBody()
+        # print "Incoming Mail: " + '\n' + new.getBody()
         subject = new.getSubject()
         subject = "AMR Response: " + subject
-        print new.getBody()
-        reply, accuracy = genSimCheck(
-            "/Users/zschiller/Desktop/PersonalEmails/",
-            "ZackCorpus", new.getBody())
-        if reply is not None:
-            print "Outgoing Mail: " + '\n' + reply
-            reply = "Accuracy = " + accuracy + '\n' + reply
+        # print new.getBody()
+        match, accuracy = genSimCheck(
+            "/Users/zschiller/Desktop/WorkEmails/",
+            "ZackWorkCorpus", "lsa", new)
+        if match is not None:
+            # print "Outgoing Mail: " + '\n' + match.getBody()
+            reply = self.buildReply(match, accuracy)
             self.send(reply, subject)
             return True
         return False
+
+    def buildReply(self, match, accuracy):
+        ''' Create text of reply email '''
+        reply = ("This is an AMR response! The accuracy of this match is " +
+                 "{:.2f}".format(accuracy * 100.) + '%\n\n' +
+                 "Date: " + match.getDate() + '\n' +
+                 "Subject: " + match.getSubject() + '\n' +
+                 "To: " + match.getToAddress() + '\n' +
+                 "From: " + match.getFromAddress() + '\n\n' +
+                 match.getOriginalBody())
+        # print match.getTokens()
+        return reply
+
 
 if __name__ == '__main__':
     proc = ProcessEmail()

@@ -47,37 +47,38 @@ def sciKitCheck(path, corpusName, query):
     return getMatch(matchLocation, path, corpusName)
 
 
-def genSimCheck(path, corpusName, query):
+def genSimCheck(path, corpusName, modelToUse, query):
     ''' Uses the GenSim tool for corpus creation and similarity check '''
 
     # Uncomment to enable GenSim logging
     # logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s',
     #    level=logging.INFO)
-    dic, corpus = createCorpus(corpusName)
-
     # Create corpus mased on topic model
-    tfidf = models.TfidfModel(corpus)
-    corpus_tfidf = tfidf[corpus]
-    # LSI
-    # lsi = models.LsiModel(corpus, id2word=dictionary, num_topics=2)
-
+    dic, corpus = createCorpus(corpusName)
+    if modelToUse == "tfidf":
+        model = models.TfidfModel(corpus)
+    elif modelToUse == "lsa":
+        model = models.LsiModel(corpus, id2word=dic, num_topics=300)
+    elif modelToUse == "lda":
+        model = models.LdaModel(corpus, id2word=dic, num_topics=300)
+    else:
+        return None, None
+    corpus = model[corpus]
     # Create Index
-    tfidfindex = similarities.MatrixSimilarity(tfidf[corpus])
-    tfidfindex.save(corpusName + "TFIDF.index")
-
+    index = similarities.MatrixSimilarity(corpus)
+    index.save(corpusName + modelToUse + ".index")
     # Similarity check against query
-    # query = "Do you want to meet Wednesday at 11am?"
-    vec_bow = dic.doc2bow(query.lower().split())
-    vec_tfidf = tfidf[vec_bow]
-    sims = tfidfindex[vec_tfidf]
+    vec_bow = dic.doc2bow(query.getTokens())
+    vectorModel = model[vec_bow]
+    sims = index[vectorModel]
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    print sims[:5]
-    if sims[0][1] > 0.5:
+    # print sims[:5]
+    if sims[0][1] > 0.10:
         # Check highest value match
         matchLocation = sims[0][0]
         return getMatch(matchLocation, path, corpusName), sims[0][1]
     else:
-        return None, None
+        return None, sims[0][1]
 
 
 def createCorpus(corpusName):
@@ -97,8 +98,8 @@ def getMatch(matchLocation, path, corpusName):
     data = fin.readlines()
     matchName = data[matchLocation]
     fin.close()
-    new = Message(path + matchName.strip())
-    return new.getBody()
+    match = Message(path + matchName.strip())
+    return match
 
 
 def createKeywordText(path, corpusName):

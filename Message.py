@@ -15,15 +15,17 @@ from nltk.corpus import stopwords
 
 
 class Message:
-    """ Message class for each message in user database """
+    ''' Message class for each message in user database '''
 
     def __init__(self, fileLocation):
+        ''' Gets file location and creates Message '''
         self.fileLocation = fileLocation
         self.error = False
         self.readEmail()
         # print "Created message"
 
     def readEmail(self):
+        ''' Walks through the email pulling out important features '''
         hasBody = False
         fp = open(self.fileLocation, 'U')
         msg = email.message_from_file(fp)
@@ -39,16 +41,23 @@ class Message:
                 except:
                     print "Error with To Address"
                     self.error = True
+        else:
+            self.toAddress = ""
         self.fromAddress = headers['from']
+        if self.fromAddress is None:
+            self.fromAddress = ""
         self.subject = headers['subject']
+        if self.subject is None:
+            self.subject = ""
         self.date = headers['date']
-        if self.date is not None:
+        if self.date is None:
             self.date = headers['sent']
         for part in msg.walk():
             # print "-------------------"
             # print part.get_content_type()
             if part.get_content_type() == "text/plain":
                 self.body = part.get_payload()  # prints the raw text
+                self.originalBody = self.body  # Save original with signature
                 self.stripSignature()
                 try:
                     self.findTokens(False)
@@ -65,6 +74,7 @@ class Message:
             self.findTokens(False)
 
     def findTokens(self, encode):
+        ''' Uses the Natural Language Toolkit to turn words into tokens '''
         stopwords = nltk.corpus.stopwords.words('english')
         addedStopWords = [u'http', 'http', u'https', 'https', u're', 're',
                           u'sent', 'sent', u'to', 'to', u'from', 'from',
@@ -89,16 +99,17 @@ class Message:
         self.tokens = [w.lower() for w in tempTokens if w not in stopwords]
 
     def stripSignature(self):
+        ''' Removes the signatures and old messages from the email '''
         signature = False
         # possibleSig = False
         # possibleSigDelete = 0
         parts = self.body.split('\n')
-        # print parts
         newBody = ""
         for i in range(len(parts)):
             if (parts[i] == '-- ' or
                     parts[i] == '--' or
                     parts[i] == '-----original message-----' or
+                    parts[i] == '----- original message -----' or
                     parts[i] == '________________________________'or
                     parts[i] == 'sent from my iphone' or
                     parts[i] == 'sent from my blackberry' or
@@ -124,9 +135,6 @@ class Message:
             if not signature:
                 newBody = newBody + str(parts[i]) + "\n"
         self.body = newBody
-        # print "-----"
-        # print self.body
-        # print "-----"
 
     def getFileLocation(self):
         return self.fileLocation
@@ -142,6 +150,9 @@ class Message:
 
     def getDate(self):
         return self.date
+
+    def getOriginalBody(self):
+        return self.originalBody
 
     def getBody(self):
         return self.body
