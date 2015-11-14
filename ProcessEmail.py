@@ -11,6 +11,7 @@ import imaplib
 import smtplib
 import time
 from main import genSimCheck
+from main import sciKitCheck
 
 
 class ProcessEmail:
@@ -85,12 +86,22 @@ class ProcessEmail:
         subject = new.getSubject()
         subject = "AMR Response: " + subject
         # print new.getBody()
-        match, accuracy = genSimCheck(
-            "/Users/zschiller/Desktop/WorkEmails/",
-            "ZackWorkCorpus", "lsa", new)
+        tool = 's'  # Chose g for Gensim or s for Scikit Learn
+        if tool == 'g':
+            match, accuracy = genSimCheck(
+                "/Users/zschiller/Desktop/WorkEmails/",
+                "ZackWorkCorpus", "lda", new)
+        elif tool == 's':
+            match, accuracy = sciKitCheck(
+                "/Users/zschiller/Desktop/PersonalEmails/",
+                "ZackCorpus", "lsa", new)
+        else:
+            match, accuracy = None, None
+
         if match is not None:
             # print "Outgoing Mail: " + '\n' + match.getBody()
             reply = self.buildReply(match, accuracy)
+            # print reply
             self.send(reply, subject)
             return True
         return False

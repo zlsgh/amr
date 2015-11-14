@@ -7,10 +7,15 @@ checks similarity matching
 from Message import Message
 import codecs
 import os
+from time import time
 
 from gensim import models, similarities, logging
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.decomposition.nmf import NMF
+from sklearn.decomposition.truncated_svd import TruncatedSVD
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics.pairwise import linear_kernel
+from sklearn.preprocessing import Normalizer
 
 from MyCorpus import MyCorpus
 
@@ -26,25 +31,71 @@ def main():
     # messages = createKeywordText(path, corpusName)
 
     pick = 3
-    print genSimCheck(path[pick], corpusName[pick], "This is a test")
+    new = Message('lastEmail.txt')
+    l, p = sciKitCheck(path[pick], corpusName[pick], "lda", new)
+    # l, p = genSimCheck(path[pick], corpusName[pick], "lda", new)
+    print l.getBody()
+    print "Percentage = ", p
 
 
-def sciKitCheck(path, corpusName, query):
+def sciKitCheck(path, corpusName, modelToUse, query):
     ''' Uses the SciKit-Learn tool for corpus creation and similarity check '''
     documents = (line.lower().split() for line in codecs.open(
         corpusName + ".txt", mode='r', encoding='utf-8', errors='ignore'))
-    modified_doc = [' '.join(i) for i in documents]
-    tf_idf = TfidfVectorizer().fit_transform(modified_doc)
+    corpus = [' '.join(i) for i in documents]
 
-    query = tf_idf[33]
-    cosine_similarities = linear_kernel(query, tf_idf).flatten()
+    # Add the query to end of the corpus
+    corpus.append(' '.join(query.getTokens()))
+
+    # Determine model to use
+    if modelToUse == "tfidf":
+        model = TfidfVectorizer().fit_transform(corpus)
+    elif modelToUse == "lsa":
+        print "Creating SciKit LSA Model"
+        t0 = time()
+        tfidf = TfidfVectorizer().fit_transform(corpus)
+        lsa = TruncatedSVD(n_components=300)
+        model = lsa.fit_transform(tfidf)
+        model = Normalizer(copy=False).fit_transform(model)
+        print("Done in %0.3fs." % (time() - t0))
+    elif modelToUse == "lda":
+        n_samples = 2000
+        n_features = 1000
+        n_topics = 300
+        # Use tf (raw term count) features for LDA.
+        print("Extracting tf features for LDA...")
+        tf_vectorizer = CountVectorizer(max_features=n_features)
+        t0 = time()
+        tf = tf_vectorizer.fit_transform(corpus)
+        print("Done in %0.3fs." % (time() - t0))
+
+        print("Fitting LDA models with tf f, n_samples=%d and n_features=%d..."
+              % (n_samples, n_features))
+        lda = LatentDirichletAllocation(n_topics=n_topics, max_iter=5,
+                                        learning_method='online',
+                                        learning_offset=50.,
+                                        random_state=0)
+        t0 = time()
+        model = lda.fit_transform(tf)
+        model = Normalizer(copy=False).fit_transform(model)
+        print("Done in %0.3fs." % (time() - t0))
+    else:
+        return None, None
+
+    query = model[-1]
+    # print query  # print query vector
+    cosine_similarities = linear_kernel(query, model).flatten()
     related_docs_indices = cosine_similarities.argsort()[:-5:-1]
     print related_docs_indices
-    print cosine_similarities[related_docs_indices]
-    matchLocation = related_docs_indices[1]
-    getMatch(33, path, corpusName)
-    print "\n"
-    return getMatch(matchLocation, path, corpusName)
+    sims = cosine_similarities[related_docs_indices]
+    print sims
+    # old = getMatch(33, path, corpusName)
+    if sims[1] > 0.10:
+        # Check highest value match
+        matchLocation = related_docs_indices[1]
+        return getMatch(matchLocation, path, corpusName), sims[1]
+    else:
+        return None, sims[1]
 
 
 def genSimCheck(path, corpusName, modelToUse, query):
@@ -53,7 +104,7 @@ def genSimCheck(path, corpusName, modelToUse, query):
     # Uncomment to enable GenSim logging
     # logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s',
     #    level=logging.INFO)
-    # Create corpus mased on topic model
+    # Create corpus based on topic model
     dic, corpus = createCorpus(corpusName)
     if modelToUse == "tfidf":
         model = models.TfidfModel(corpus)
@@ -63,7 +114,10 @@ def genSimCheck(path, corpusName, modelToUse, query):
         model = models.LdaModel(corpus, id2word=dic, num_topics=300)
     else:
         return None, None
+    t0 = time()
+    print "Creating GenSim Corpus"
     corpus = model[corpus]
+    print("Done in %0.3fs." % (time() - t0))
     # Create Index
     index = similarities.MatrixSimilarity(corpus)
     index.save(corpusName + modelToUse + ".index")
@@ -72,7 +126,7 @@ def genSimCheck(path, corpusName, modelToUse, query):
     vectorModel = model[vec_bow]
     sims = index[vectorModel]
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    # print sims[:5]
+    print sims[:5]
     if sims[0][1] > 0.10:
         # Check highest value match
         matchLocation = sims[0][0]
