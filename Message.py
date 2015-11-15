@@ -7,11 +7,9 @@ important data extracted so that it can be recalled
 '''
 import email
 from email.parser import Parser
-
 import string
 
 import nltk
-from nltk.corpus import stopwords
 
 
 class Message:

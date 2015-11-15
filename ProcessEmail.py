@@ -86,7 +86,7 @@ class ProcessEmail:
         subject = new.getSubject()
         subject = "AMR Response: " + subject
         # print new.getBody()
-        tool = 's'  # Chose g for Gensim or s for Scikit Learn
+        tool = 'n'  # Chose g for Gensim or s for Scikit Learn
         if tool == 'g':
             match, accuracy = genSimCheck(
                 "/Users/zschiller/Desktop/WorkEmails/",
