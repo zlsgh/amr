@@ -6,6 +6,7 @@
 *.mm
 *.dict
 *.txt
+*.csv
 *.lda-c
 *.project
 *.pydevproject

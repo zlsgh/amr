@@ -19,6 +19,7 @@ from sklearn.preprocessing import Normalizer
 from MyCorpus import MyCorpus
 from SciKitModel import SciKitModel
 from GenSimModel import GenSimModel
+import warnings
 
 
 def main():
@@ -31,9 +32,12 @@ def main():
         "ClintonCorpus", "20NewsCorpus", "ZackWorkCorpus", "ZackCorpus"]
     # messages = createKeywordText(path, corpusName)
 
-    pick = 3
-    new = Message('lastEmail.txt')
-    multiCheck(path[pick], corpusName[pick], new)
+    pick = 1
+    warnings.filterwarnings("ignore")
+    datasetCheck(path[pick], corpusName[pick])
+    # print getMatch(0, path[pick], corpusName[pick]).getFileLocation()
+    # new = Message('lastEmail.txt')
+    # multiCheck(path[pick], corpusName[pick], new)
     # return getMatch(matchLocation, path, corpusName), sims[1]
 
 
@@ -70,6 +74,70 @@ def multiCheck(path, corpusName, new):
     print("All tools and models checked in %0.3fs." % (time() - t1))
 
 
+def datasetCheck(path, corpusName):
+    print "Setting up all models and tools..."
+    t1 = time()
+    sk = SciKitModel(path, corpusName)
+    gs = GenSimModel(path, corpusName)
+    print("Tools and models set up in %0.3fs." % (time() - t1))
+    resultFile = open(corpusName + 'results.csv', 'w')
+    resultFile.write(
+        "Filename,Tool,Model,Result 1,Result 1 Sim,Result 2,Result 2 Sim," +
+        "Result 3,Result 3 Sim,Result 4,Result 4 Sim,Result 5,Result 5 Sim\n")
+    i = 0
+    l = len(os.listdir(path))
+    for filename in os.listdir(path):
+        print "Working on", str(filename)
+        new = Message(path + filename)
+        resultFile.write(filename + ",SciKit," + "tfidf")
+        res = sciKitCheck(sk.getTfidf(), i)
+        for j in range(len(res)):
+            resultFile.write(',' + str(res[j][0]) + ',')
+            resultFile.write(str(res[j][1]))
+        resultFile.write('\n')
+
+        resultFile.write(filename + ",SciKit," + "lsa")
+        res = sciKitCheck(sk.getLsa(), i)
+        for j in range(len(res)):
+            resultFile.write(',' + str(res[j][0]) + ',')
+            resultFile.write(str(res[j][1]))
+        resultFile.write('\n')
+
+        resultFile.write(filename + ",SciKit," + "lda")
+        res = sciKitCheck(sk.getTfidf(), i)
+        for j in range(len(res)):
+            resultFile.write(',' + str(res[j][0]) + ',')
+            resultFile.write(str(res[j][1]))
+        resultFile.write('\n')
+
+        resultFile.write(filename + ",GenSim," + "tfidf")
+        res = genSimCheck(
+            gs.getDictionary(), gs.getTfidfIndex(), gs.getTfidf(), new)
+        for j in range(len(res)):
+            resultFile.write(',' + str(res[j][0]) + ',')
+            resultFile.write(str(res[j][1]))
+        resultFile.write('\n')
+
+        resultFile.write(filename + ",GenSim," + "lsa")
+        res = genSimCheck(
+            gs.getDictionary(), gs.getLsaIndex(), gs.getLsa(), new)
+        for j in range(len(res)):
+            resultFile.write(',' + str(res[j][0]) + ',')
+            resultFile.write(str(res[j][1]))
+        resultFile.write('\n')
+
+        resultFile.write(filename + ",GenSim," + "lda")
+        res = genSimCheck(
+            gs.getDictionary(), gs.getLdaIndex(), gs.getLda(), new)
+        for j in range(len(res)):
+            resultFile.write(',' + str(res[j][0]) + ',')
+            resultFile.write(str(res[j][1]))
+        resultFile.write('\n')
+        i += 1
+        print("Completed " + str(i) + " of " + str(l) + '\n')
+    resultFile.close()
+
+
 def sciKitCheck(model, query=None):
     ''' Uses the SciKit-Learn tool for corpus creation and similarity check '''
     if query is None:
@@ -95,9 +163,9 @@ def genSimCheck(dic, index, model, query):
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
     # Format result
     result = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
-    for n in range(5):
-        result[n][0] = sims[n][0]
-        result[n][1] = round((sims[n][1] * 100.), 4)
+    for n in range(1, 6):
+        result[n-1][0] = sims[n][0]
+        result[n-1][1] = round((sims[n][1] * 100.), 4)
     return result
 
 

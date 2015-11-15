@@ -36,7 +36,6 @@ class GenSimModel:
         t0 = time()
         print "Creating GenSim TF-IDF Model and Index"
         self.tfidfModel = models.TfidfModel(self.corpus)
-        print("Done in %0.3fs." % (time() - t0))
         tempCorpus = self.tfidfModel[self.corpus]
         # Create Index
         self.tfidfIndex = similarities.MatrixSimilarity(tempCorpus)
