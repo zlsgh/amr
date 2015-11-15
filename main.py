@@ -75,12 +75,14 @@ def multiCheck(path, corpusName, new):
 
 
 def datasetCheck(path, corpusName):
+    ''' Go through dataset comparing all documents to corpus '''
     print "Setting up all models and tools..."
     t1 = time()
+    t0 = time()
     sk = SciKitModel(path, corpusName)
     gs = GenSimModel(path, corpusName)
     print("Tools and models set up in %0.3fs." % (time() - t1))
-    resultFile = open(corpusName + 'results.csv', 'w')
+    resultFile = open(corpusName + 'Results.csv', 'w')
     resultFile.write(
         "Filename,Tool,Model,Result 1,Result 1 Sim,Result 2,Result 2 Sim," +
         "Result 3,Result 3 Sim,Result 4,Result 4 Sim,Result 5,Result 5 Sim\n")
@@ -136,6 +138,7 @@ def datasetCheck(path, corpusName):
         i += 1
         print("Completed " + str(i) + " of " + str(l) + '\n')
     resultFile.close()
+    print("Created .csv of matches for dataset in %0.3fs." % (time() - t0))
 
 
 def sciKitCheck(model, query=None):
@@ -143,30 +146,36 @@ def sciKitCheck(model, query=None):
     if query is None:
         query = -1
     query = model[query]
-    # This raises a small warning
-    cosine_similarities = linear_kernel(query, model).flatten()
-    related_docs_indices = cosine_similarities.argsort()[:-7:-1]
-    sims = cosine_similarities[related_docs_indices]
-    # Format result
-    result = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
-    for n in range(1, 6):
-        result[n - 1][0] = related_docs_indices[n]
-        result[n - 1][1] = round((sims[n] * 100.), 4)
-    return result
+    try:
+        # This raises a small warning
+        cosine_similarities = linear_kernel(query, model).flatten()
+        related_docs_indices = cosine_similarities.argsort()[:-7:-1]
+        sims = cosine_similarities[related_docs_indices]
+        # Format result
+        result = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+        for n in range(1, 6):
+            result[n - 1][0] = related_docs_indices[n]
+            result[n - 1][1] = round((sims[n] * 100.), 4)
+        return result
+    except:
+        return [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
 
 
 def genSimCheck(dic, index, model, query):
     ''' Uses the GenSim tool for corpus creation and similarity check '''
-    vec_bow = dic.doc2bow(query.getTokens())
-    vectorModel = model[vec_bow]
-    sims = index[vectorModel]
-    sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    # Format result
-    result = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
-    for n in range(1, 6):
-        result[n-1][0] = sims[n][0]
-        result[n-1][1] = round((sims[n][1] * 100.), 4)
-    return result
+    try:
+        vec_bow = dic.doc2bow(query.getTokens())
+        vectorModel = model[vec_bow]
+        sims = index[vectorModel]
+        sims = sorted(enumerate(sims), key=lambda item: -item[1])
+        # Format result
+        result = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+        for n in range(1, 6):
+            result[n - 1][0] = sims[n][0]
+            result[n - 1][1] = round((sims[n][1] * 100.), 4)
+        return result
+    except:
+        return [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
 
 
 def getMatch(matchLocation, path, corpusName):
