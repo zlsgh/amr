@@ -13,6 +13,7 @@ from sklearn.metrics.pairwise import linear_kernel
 
 from GenSimModel import GenSimModel
 from SciKitModel import SciKitModel
+import ProcessEmail
 
 
 def main():
@@ -32,6 +33,41 @@ def main():
     # new = Message('lastEmail.txt')
     # multiCheck(path[pick], corpusName[pick], new)
     # return getMatch(matchLocation, path, corpusName), sims[1]
+
+
+def emailCheck(path, corpusName, modelToUse, tool, query, models):
+    ''' This function is used for replying to a specific email '''
+    if tool == "gensim":
+        if models is None:
+            gs = GenSimModel(path, corpusName)
+            models = gs
+        else:
+            gs = models
+
+        if modelToUse == "tfidf":
+            result = genSimCheck(
+                gs.getDictionary(), gs.getTfidfIndex(), gs.getTfidf(), query)
+        elif modelToUse == "lsa":
+            result = genSimCheck(
+                gs.getDictionary(), gs.getLsaIndex(), gs.getLsa(), query)
+        elif modelToUse == "lda":
+            result = genSimCheck(
+                gs.getDictionary(), gs.getLdaIndex(), gs.getLda(), query)
+    elif tool == "scikit":
+        if models is None:
+            sk = SciKitModel(path, corpusName, query)
+            models = sk
+        else:
+            gs = models
+
+        if modelToUse == "tfidf":
+            result = sciKitCheck(sk.getTfidf(), query)
+        elif modelToUse == "lsa":
+            result = sciKitCheck(sk.getLsa()(), query)
+        elif modelToUse == "lda":
+            result = sciKitCheck(sk.getLda(), query)
+
+    return getMatch(result[0][0], path, corpusName), result[0][1], models
 
 
 def multiCheck(path, corpusName, new):
@@ -212,50 +248,53 @@ def createKeywordText(path, corpusName):
     saveCorpus.close()
     saveCorpusIndex.close()
     print "Errors creating keyword text = " + str(errors)
-    return messages
+    return True
 
 
 def getInfo():
     ''' Get initial information from the user about haivng a .mbox
     or where the email files are stored. Then runs the setup process
     finally returning the list of locations where the emails are '''
-    print "This program tells you which emails are similar to one another."
+    print ("Welcome to AMR! AMR helps you by automatically sending you reply"
+           " suggestions for each of your new emails!")
     mbox = 'i'
     while (mbox == 'i'):
-        mbox = raw_input(("Do you have a .mbox archive of your email to use? "
-                          "(y/n/i=moreinfo): "))
+        mbox = raw_input("Do you have a .mbox archive of your email to use? "
+                         "(y/n/i=moreinfo): ")
         if mbox == 'y':
-            fileLoc = raw_input(("Please enter the location and name of your "
-                                 ".mbox file (ex: /users/you/Downlods/myEmails"
-                                 ".mbox): "))
-            locToSave = raw_input(("Please enter the location that you "
-                                   "would like to save these emails "
-                                   "(ex: /users/you/Documents/myEmails/): "))
-            cont = raw_input(("Are you sure you want to use your .mbox? This "
-                              "will split the archive into individual email "
-                              "files. Careful as this does make a lot of files"
-                              " (y/n): "))
+            fileLoc = raw_input("Please enter the location and name of your "
+                                ".mbox file (ex: /users/you/Downlods/myEmails"
+                                ".mbox): ")
+            path = raw_input("Please enter the location that you "
+                             "would like to save these emails "
+                             "(ex: /users/you/Documents/myEmails/): ")
+            cont = raw_input("This process will split the archive into "
+                             "individual email files. This will make a lot "
+                             "of files. (y/n): ")
             if cont == 'y':
-                listEmails = splitEmails(fileLoc, locToSave)
-                return listEmails
+                try:
+                    splitEmails(fileLoc, path)
+                except:
+                    print ("There was a problem with the files."
+                           " Please try again.")
+                    mbox = 'i'
         elif mbox == 'i':
             print ("You can export your email from most common email "
-                   "clients, including gmail, to an archived .mbox file. "
+                   "clients, including Gmail, to an archived .mbox file. "
                    "This program can read that to build your archive to "
                    "search through!")
-    numEmails = raw_input("Please input the number of emails you have: ")
-    fileLoc = raw_input(("Please enter the location of the emails you would "
-                         "like to add to the archive database: "))
-    fileNames = raw_input(("Please enter the name of the files (ex: "
-                           "if files are email0.txt, email1.txt, etc. please "
-                           "enter email.txt): "))
-    dot = fileNames.index('.')
-    listEmails = []
-    for i in range(int(numEmails)):
-        print "checking " + str(i)
-        name = fileNames[:dot] + str(i)
-        listEmails.append(fileLoc + fileNames[:dot] + str(i) + fileNames[dot:])
-    return listEmails
+    corpusName = raw_input("Next AMR will build the corpus text based on all"
+                           " of your emails. This will take some time as each"
+                           " email will be checked. Please enter what you"
+                           " would like to name this corpus (i.e. myEmails):")
+    print createKeywordText(path, corpusName)
+    cont = raw_input("You are all set and ready to run AMR!\n"
+                     "Would you like to run AMR now? (y/n): ")
+    if cont == 'y':
+        ProcessEmail.ProcessEmail(path, corpusName)
+    else:
+        print ("To start the AMR system later run the ProcessEmail.py program"
+               " along with the path to the messages and your corpus name.")
 
 
 def splitEmails(filename, locToSave):
@@ -282,7 +321,7 @@ def splitEmails(filename, locToSave):
     fout.close()
     fin.close()
     print "Created " + str(count) + " files from emails."
-    return listEmails
+    return True
 
 
 def splitMultiMbox(path, locToSave):
@@ -336,5 +375,5 @@ def testMessages(msg):
 
 
 if __name__ == '__main__':
-    # getInfo()
-    main()
+    getInfo()
+    # main()

@@ -11,16 +11,21 @@ import imaplib
 import smtplib
 import time
 
-from main import genSimCheck
-from main import sciKitCheck
+from main import emailCheck
 
 
 class ProcessEmail:
 
-    def __init__(self):
+    def __init__(self, path=None, corpusName=None):
         self.login()
+        self.path = path
+        self.path = "/Users/zschiller/Desktop/WorkEmails/"
+
+        self.corpusName = corpusName
+        self.corpusName = "ZackWorkCorpus"
         run = True
         last_email_id = 0
+        self.models = None
         while run:
             # print self.mail.list()
             # Out: list of "folders" aka labels in gmail.
@@ -35,7 +40,7 @@ class ProcessEmail:
             msg = email.message_from_string(data[0][1])
             msgSubject = msg['subject']
             msgFrom = msg['from']
-            if (("zacheryschiller@gmail.com" not in msgFrom) and
+            if ((self.user not in msgFrom) and
                     ("AMR Response:" not in msgSubject) and
                     (last_email_id != latest_email_id)):
                 last_email_id = latest_email_id
@@ -59,8 +64,8 @@ class ProcessEmail:
     def send(self, message, subject):
         server = 'smtp.gmail.com'
 
-        recipient = 'zacheryschiller@gmail.com'
-        sender = 'zacheryschiller@gmail.com'
+        recipient = self.user
+        sender = self.user
 
         newMessage = "To: " + recipient + "\n" + "From: " + \
             sender + "\n" + "Subject: " + subject + "\n" + message
@@ -87,15 +92,16 @@ class ProcessEmail:
         subject = new.getSubject()
         subject = "AMR Response: " + subject
         # print new.getBody()
-        tool = 'n'  # Chose g for Gensim or s for Scikit Learn
+        tool = 'g'  # Chose g for Gensim or s for Scikit Learn
+        modelToUse = "lda"
         if tool == 'g':
-            match, accuracy = genSimCheck(
-                "/Users/zschiller/Desktop/WorkEmails/",
-                "ZackWorkCorpus", "lda", new)
+            match, accuracy, self.models = emailCheck(
+                self.path, self.corpusName, modelToUse, "gensim",
+                new, self.models)
         elif tool == 's':
-            match, accuracy = sciKitCheck(
-                "/Users/zschiller/Desktop/PersonalEmails/",
-                "ZackCorpus", "lsa", new)
+            match, accuracy, self.models = emailCheck(
+                self.path, self.corpusName, modelToUse, "scikit",
+                new, self.models)
         else:
             match, accuracy = None, None
 
@@ -110,7 +116,7 @@ class ProcessEmail:
     def buildReply(self, match, accuracy):
         ''' Create text of reply email '''
         reply = ("This is an AMR response! The accuracy of this match is " +
-                 "{:.2f}".format(accuracy * 100.) + '%\n\n' +
+                 str(accuracy) + '%\n\n' +
                  "Date: " + match.getDate() + '\n' +
                  "Subject: " + match.getSubject() + '\n' +
                  "To: " + match.getToAddress() + '\n' +
