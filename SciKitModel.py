@@ -35,7 +35,7 @@ class SciKitModel:
         print "Creating SciKit LDA Model"
         # Use tf (raw term count) features for LDA.
         print("Extracting tf features for LDA")
-        tf_vectorizer = CountVectorizer(max_features=1000)
+        tf_vectorizer = CountVectorizer(max_features=2000)
         t0 = time()
         tf = tf_vectorizer.fit_transform(self.corpus)
         print("Done in %0.3fs." % (time() - t0))

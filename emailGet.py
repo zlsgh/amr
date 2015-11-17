@@ -4,7 +4,6 @@
 Title: Email Archive Downloader
 '''
 
-# # Imports
 import os
 import urllib2
 

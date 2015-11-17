@@ -5,21 +5,14 @@ checks similarity matching
 '''
 
 from Message import Message
-import codecs
 import os
 from time import time
-
-from gensim import models, similarities, logging
-from sklearn.decomposition import LatentDirichletAllocation
-from sklearn.decomposition.truncated_svd import TruncatedSVD
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.metrics.pairwise import linear_kernel
-from sklearn.preprocessing import Normalizer
-
-from MyCorpus import MyCorpus
-from SciKitModel import SciKitModel
-from GenSimModel import GenSimModel
 import warnings
+
+from sklearn.metrics.pairwise import linear_kernel
+
+from GenSimModel import GenSimModel
+from SciKitModel import SciKitModel
 
 
 def main():
