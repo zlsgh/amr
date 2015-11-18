@@ -24,10 +24,11 @@ def main():
             "/Users/zschiller/Desktop/PersonalEmails/"]
     corpusName = [
         "ClintonCorpus", "20NewsCorpus", "ZackWorkCorpus", "ZackCorpus"]
-    # messages = createKeywordText(path, corpusName)
 
-    pick = 1
+    pick = 2
     warnings.filterwarnings("ignore")
+    print createKeywordText(path[pick], corpusName[pick])
+
     datasetCheck(path[pick], corpusName[pick])
     # print getMatch(0, path[pick], corpusName[pick]).getFileLocation()
     # new = Message('lastEmail.txt')
@@ -375,5 +376,5 @@ def testMessages(msg):
 
 
 if __name__ == '__main__':
-    getInfo()
-    # main()
+    # getInfo()
+    main()
