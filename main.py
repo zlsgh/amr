@@ -25,9 +25,9 @@ def main():
     corpusName = [
         "ClintonCorpus", "20NewsCorpus", "ZackWorkCorpus", "ZackCorpus"]
 
-    pick = 2
+    pick = 1
     warnings.filterwarnings("ignore")
-    print createKeywordText(path[pick], corpusName[pick])
+    # print createKeywordText(path[pick], corpusName[pick])
 
     datasetCheck(path[pick], corpusName[pick])
     # print getMatch(0, path[pick], corpusName[pick]).getFileLocation()
@@ -59,14 +59,14 @@ def emailCheck(path, corpusName, modelToUse, tool, query, models):
             sk = SciKitModel(path, corpusName, query)
             models = sk
         else:
-            gs = models
+            sk = SciKitModel(path, corpusName, query)
 
         if modelToUse == "tfidf":
-            result = sciKitCheck(sk.getTfidf(), query)
+            result = sciKitCheck(sk.getTfidf())
         elif modelToUse == "lsa":
-            result = sciKitCheck(sk.getLsa()(), query)
+            result = sciKitCheck(sk.getLsa())
         elif modelToUse == "lda":
-            result = sciKitCheck(sk.getLda(), query)
+            result = sciKitCheck(sk.getLda())
 
     return getMatch(result[0][0], path, corpusName), result[0][1], models
 
@@ -175,6 +175,7 @@ def sciKitCheck(model, query=None):
     ''' Uses the SciKit-Learn tool for corpus creation and similarity check '''
     if query is None:
         query = -1
+    print query
     query = model[query]
     try:
         # This raises a small warning

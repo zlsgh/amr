@@ -10,8 +10,7 @@ import getpass
 import imaplib
 import smtplib
 import time
-
-from main import emailCheck
+import main
 
 
 class ProcessEmail:
@@ -19,10 +18,10 @@ class ProcessEmail:
     def __init__(self, path=None, corpusName=None):
         self.login()
         self.path = path
-        self.path = "/Users/zschiller/Desktop/WorkEmails/"
+        self.path = "/Users/zschiller/Desktop/Clinton/"
 
         self.corpusName = corpusName
-        self.corpusName = "ZackWorkCorpus"
+        self.corpusName = "ClintonCorpus"
         run = True
         last_email_id = 0
         self.models = None
@@ -95,11 +94,11 @@ class ProcessEmail:
         tool = 'g'  # Chose g for Gensim or s for Scikit Learn
         modelToUse = "lda"
         if tool == 'g':
-            match, accuracy, self.models = emailCheck(
+            match, accuracy, self.models = main.emailCheck(
                 self.path, self.corpusName, modelToUse, "gensim",
                 new, self.models)
         elif tool == 's':
-            match, accuracy, self.models = emailCheck(
+            match, accuracy, self.models = main.emailCheck(
                 self.path, self.corpusName, modelToUse, "scikit",
                 new, self.models)
         else:
@@ -115,13 +114,33 @@ class ProcessEmail:
 
     def buildReply(self, match, accuracy):
         ''' Create text of reply email '''
+        if match.getDate() is None:
+            date = ""
+        else:
+            date = match.getDate()
+        if match.getSubject() is None:
+            subj = ""
+        else:
+            subj = match.getSubject()
+        if match.getToAddress() is None:
+            toAddr = ""
+        else:
+            toAddr = match.getToAddress()
+        if match.getFromAddress() is None:
+            fromAddr = ""
+        else:
+            fromAddr = match.getFromAddress()
+        if match.getOriginalBody() is None:
+            origBody = ""
+        else:
+            origBody = match.getOriginalBody()
         reply = ("This is an AMR response! The accuracy of this match is " +
                  str(accuracy) + '%\n\n' +
-                 "Date: " + match.getDate() + '\n' +
-                 "Subject: " + match.getSubject() + '\n' +
-                 "To: " + match.getToAddress() + '\n' +
-                 "From: " + match.getFromAddress() + '\n\n' +
-                 match.getOriginalBody())
+                 "Date: " + date + '\n' +
+                 "Subject: " + subj + '\n' +
+                 "To: " + toAddr + '\n' +
+                 "From: " + fromAddr + '\n\n' +
+                 origBody)
         # print match.getTokens()
         return reply
 

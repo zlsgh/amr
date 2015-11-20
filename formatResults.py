@@ -4,7 +4,7 @@ Formatting the results of the dataset tests so they can be compared
 '''
 
 if __name__ == '__main__':
-    resultsFileName = "20NewsCorpusResults.csv"
+    resultsFileName = "ZackCorpusResults.csv"
     resultsScoreFileName = resultsFileName[:-4] + "_Scores.csv"
     fin = open(resultsFileName, 'r')
     data = fin.readlines()
@@ -44,8 +44,9 @@ if __name__ == '__main__':
                 matches[info[11]] = 1
 
         for num in matches:  # Divide the matches by 90 (The number of points)
-            matches[num] /= 90.0
-        line = file
+            matches[num] /= 30.0
+        line = l[0]
+        print line
         for k in range(6):  # Get the info and write it out to the score .csv
             info = data[j + k].split(',')
             tool = info[1]
