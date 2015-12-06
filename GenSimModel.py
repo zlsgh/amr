@@ -1,4 +1,9 @@
-# !/usr/bin/python
+#!/usr/bin/env python
+
+'''
+This is the class for the three topic models created with the
+GenSim Python tool
+'''
 
 import codecs
 from time import time
@@ -10,7 +15,7 @@ class GenSimModel:
 
     def __init__(self, path, corpusName):
         ''' This function creates a GenSim corpus and dictionary based on the
-        texts kept in file '''
+        texts kept in the keyword-texts file. '''
         # Get documents out of mycorpus.txt file
         self.documents = (line.lower().split() for line in codecs.open(
             corpusName + ".txt", mode='r', encoding='utf-8', errors='ignore'))

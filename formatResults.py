@@ -3,7 +3,8 @@
 Formatting the results of the dataset tests so they can be compared
 '''
 
-if __name__ == '__main__':
+
+def main():
     resultsFileName = "ZackCorpusResults.csv"
     resultsScoreFileName = resultsFileName[:-4] + "_Scores.csv"
     fin = open(resultsFileName, 'r')
@@ -56,3 +57,6 @@ if __name__ == '__main__':
         fout.write(line + '\n')
         j += 6
     fout.close()
+
+if __name__ == '__main__':
+    main()

@@ -1,8 +1,9 @@
-# !/usr/bin/python
+#!/usr/bin/env python
 
 '''
-My Corpus class used to create the gensim corpus from the token data
-stored in a corpus.txt file.
+NOT PART OF RUNNING AMR
+This my Corpus class used to create the gensim corpus from the token data
+stored in a corpus.txt file. However, this is now done in the GenSimModel class
 '''
 
 import codecs

@@ -12,8 +12,8 @@ import warnings
 from sklearn.metrics.pairwise import linear_kernel
 
 from GenSimModel import GenSimModel
-from SciKitModel import SciKitModel
 import ProcessEmail
+from SciKitModel import SciKitModel
 
 
 def main():
@@ -25,15 +25,19 @@ def main():
     corpusName = [
         "ClintonCorpus", "20NewsCorpus", "ZackWorkCorpus", "ZackCorpus"]
 
-    pick = 1
+    pick = 3
     warnings.filterwarnings("ignore")
+
+    # Uncomment to create keyword text for an archive
     # print createKeywordText(path[pick], corpusName[pick])
 
-    datasetCheck(path[pick], corpusName[pick])
+    # Uncomment to check each doc in a dataset against model for comparisons
+    # datasetCheck(path[pick], corpusName[pick])
+
+    # Uncomment to check the results of a new email saved as a text file
     # print getMatch(0, path[pick], corpusName[pick]).getFileLocation()
-    # new = Message('lastEmail.txt')
-    # multiCheck(path[pick], corpusName[pick], new)
-    # return getMatch(matchLocation, path, corpusName), sims[1]
+    new = Message('lastEmail.txt')
+    multiCheck(path[pick], corpusName[pick], new)  # Results printed to file.
 
 
 def emailCheck(path, corpusName, modelToUse, tool, query, models):
@@ -175,7 +179,6 @@ def sciKitCheck(model, query=None):
     ''' Uses the SciKit-Learn tool for corpus creation and similarity check '''
     if query is None:
         query = -1
-    print query
     query = model[query]
     try:
         # This raises a small warning
@@ -186,7 +189,7 @@ def sciKitCheck(model, query=None):
         result = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
         for n in range(1, 6):
             result[n - 1][0] = related_docs_indices[n]
-            result[n - 1][1] = round((sims[n] * 100.), 4)
+            result[n - 1][1] = round((sims[n] * 100), 1)
         return result
     except:
         return [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
@@ -203,7 +206,7 @@ def genSimCheck(dic, index, model, query):
         result = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
         for n in range(1, 6):
             result[n - 1][0] = sims[n][0]
-            result[n - 1][1] = round((sims[n][1] * 100.), 4)
+            result[n - 1][1] = round((sims[n][1] * 100), 1)
         return result
     except:
         return [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
@@ -253,7 +256,7 @@ def createKeywordText(path, corpusName):
     return True
 
 
-def getInfo():
+def setup():
     ''' Get initial information from the user about haivng a .mbox
     or where the email files are stored. Then runs the setup process
     finally returning the list of locations where the emails are '''
@@ -327,7 +330,7 @@ def splitEmails(filename, locToSave):
 
 
 def splitMultiMbox(path, locToSave):
-    ''' Funtion to split multiple .mbox files up into individual files '''
+    ''' Function to split multiple .mbox files up into individual files '''
     count = 0
     i = 0
     l = len(os.listdir(path))
@@ -377,5 +380,8 @@ def testMessages(msg):
 
 
 if __name__ == '__main__':
-    # getInfo()
-    main()
+    # Uncomment to run AMR for first time to set up models and archives
+    setup()
+
+    # Uncomment to run specific tasks such as checking one message only
+    # main()

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 '''
-Title: Email Archive Downloader
+This program is used to download a set of files from the FOIA
+server, based on a json list of files returned from the site
 '''
 
 import os
@@ -53,9 +54,6 @@ def download_file(download_url, docName):
     fin.close()
     print("Completed")
 
-# # Run the main program
+# Run the main program
 if __name__ == '__main__':
     main()
-
-# #
-######

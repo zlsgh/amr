@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
-This class is designed to receive emails, add them to database,
-and send a response email out.
+This program is designed to run constantly. Receiving emails, adding them to
+the models and sending a response email out.
 '''
 
 from Message import Message
@@ -10,6 +10,8 @@ import getpass
 import imaplib
 import smtplib
 import time
+import warnings
+
 import main
 
 
@@ -18,14 +20,15 @@ class ProcessEmail:
     def __init__(self, path=None, corpusName=None):
         self.login()
         self.path = path
-        self.path = "/Users/zschiller/Desktop/Clinton/"
+        # self.path = "/Users/zschiller/Desktop/Clinton/"
 
         self.corpusName = corpusName
-        self.corpusName = "ClintonCorpus"
+        # self.corpusName = "ClintonCorpus"
         run = True
         last_email_id = 0
         self.models = None
         while run:
+            warnings.filterwarnings("ignore")
             # print self.mail.list()
             # Out: list of "folders" aka labels in gmail.
             self.mail.select("inbox")  # connect to inbox.
@@ -78,9 +81,9 @@ class ProcessEmail:
 
     def login(self):
         ''' Get login info from user '''
-        self.user = "zacheryschiller@gmail.com"
-        # getpass.getuser("Please enter your email address:")
-        self.pswd = getpass.getpass("Please enter your password:")
+        # self.user = "zacheryschiller@gmail.com"
+        self.user = raw_input("Please enter your email address: ")
+        self.pswd = getpass.getpass("Please enter your password: ")
         self.mail = imaplib.IMAP4_SSL('imap.gmail.com')
         self.mail.login(self.user, self.pswd)
 
@@ -91,7 +94,7 @@ class ProcessEmail:
         subject = new.getSubject()
         subject = "AMR Response: " + subject
         # print new.getBody()
-        tool = 'g'  # Chose g for Gensim or s for Scikit Learn
+        tool = 's'  # Chose g for Gensim or s for Scikit Learn
         modelToUse = "lda"
         if tool == 'g':
             match, accuracy, self.models = main.emailCheck(
@@ -146,4 +149,8 @@ class ProcessEmail:
 
 
 if __name__ == '__main__':
-    proc = ProcessEmail()
+    path = raw_input("Please enter the location that you saved your emails to "
+                     "(ex: /users/you/Documents/myEmails/): ")
+    corpus = raw_input(
+        "Please enter what the name of your corpus text (i.e. myEmails): ")
+    proc = ProcessEmail(path, corpus)

@@ -1,5 +1,9 @@
-# !/usr/bin/python
+#!/usr/bin/env python
 
+'''
+This is the class for the three topic models created with the
+SciKit-Learn Python tool
+'''
 import codecs
 from time import time
 

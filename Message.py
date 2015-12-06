@@ -1,4 +1,4 @@
-# !/usr/bin/python
+#!/usr/bin/env python
 
 '''
 This is the Message Class which uses the NLTK and Email

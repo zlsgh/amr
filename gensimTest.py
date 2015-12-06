@@ -1,8 +1,10 @@
-# !/usr/bin/python
+#!/usr/bin/env python
 
-''' Testing using GenSim utility '''
+'''
+NOT PART OF RUNNING AMR
+Testing using GenSim utility
+'''
 import logging
-from math import *
 
 from gensim import corpora, models, similarities
 import nltk
@@ -10,8 +12,6 @@ import nltk
 
 logging.basicConfig(
     format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-
-# # Main program
 
 
 def main():
@@ -34,9 +34,6 @@ def main():
     corpus = [dictionary.doc2bow(token) for token in tokens]
     print corpus
 
-# # Run the main program
+# Run the main program
 if __name__ == '__main__':
     main()
-
-# #
-######

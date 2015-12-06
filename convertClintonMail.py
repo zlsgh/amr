@@ -1,18 +1,11 @@
-# !/usr/bin/python
+#!/usr/bin/env python
 
 '''
 This program is used to convert Secretary Clinton's emails into the standard
 format for use with the standard AMR project.
 '''
 from Message import Message
-import email
-from email.parser import Parser
 import os
-import re
-import string
-
-import nltk
-from nltk.corpus import stopwords
 
 
 def convert(fileLocation):
@@ -20,7 +13,7 @@ def convert(fileLocation):
     data = fin.read()
     fin.close()
 
-    # Formatting for messups in conversion
+    # Formatting for errors in conversion
     data = data.replace(" From:", "\nFrom:")
     data = data.replace(" Sent:", "\nSent:")
     data = data.replace(" To:", "\nTo:")
@@ -81,21 +74,27 @@ def convert(fileLocation):
     fout2.close()
     return new.getError()
 
-path = "/Users/zschiller/Desktop/hillary_text/"
-i = 0
-j = 0
-l = len(os.listdir(path))
 
-for filename in os.listdir(path):
-    print "Working on", str(filename)
-    if filename == ".DS_Store":
-        pass
-    elif j == 10:
-        break
-    else:
-        result = convert(filename)
-        if result:
-            j += 1
-    i += 1
-    print("completed " + str(i) + " of " + str(l) + '\n')
-print "Errors = " + str(j)
+def main():
+    path = "/Users/zschiller/Desktop/hillary_text/"
+    i = 0
+    j = 0
+    l = len(os.listdir(path))
+
+    for filename in os.listdir(path):
+        print "Working on", str(filename)
+        if filename == ".DS_Store":
+            pass
+        elif j == 10:
+            break
+        else:
+            result = convert(filename)
+            if result:
+                j += 1
+        i += 1
+        print("completed " + str(i) + " of " + str(l) + '\n')
+    print "Errors = " + str(j)
+
+# Run the main program
+if __name__ == '__main__':
+    main()

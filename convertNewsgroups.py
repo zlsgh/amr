@@ -36,4 +36,6 @@ def main():
         # print("completed " + str(i) + " of " + str(l) + '\n')
     print("replaced" + str(j))
 
-main()
+# Run the main program
+if __name__ == '__main__':
+    main()

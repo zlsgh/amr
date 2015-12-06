@@ -1,20 +1,20 @@
-automailreply
+Automatic Mail Reply (AMR)
 =============
-People receive and respond to emails hundreds of times a week. In some professions, such as computer technicians, these emails constantly contain the same questions and responses to and from different people. A significant amount of time is spent on repeatedly answering the same questions. Systems exist through websites or phone machines where people with questions can be guided to the answer by narrowing down their search through a set database. These systems cannot evolve and often people want the response directly from the source, the individual they are emailing. Thus an automated email replying system could help both parties.
-
-What if every time you got a new email a system checked to see if you had already answered an email like that and showed you the response you already wrote?
-
-Well that is precisely what this project aims to do. AutoMailReply allows you to import your old email through the standard .mbox format and add them to a database. Once this database is created, AutoMailReply can take in new messages, compare them with your old ones, and give you relevant responses based on prior interactions!
+Responding to email is a time-consuming task that is a requirement for most professions. Many people find themselves answering the same questions over and over, repeatedly replying with answers they have written previously either in whole or in part. This tool, called Automatic Mail Reply (AMR), is implemented to help with repeated email response creation. The system uses past email interactions and, through unsupervised statistical learning, attempts to recover relevant information to give to the user to assist in writing their reply. The statistical learning models, term frequency - inverse document frequency (tf-idf), Latent Semantic Analysis (LSA), and Latent Dirichlet Allocation (LDA) are used for this email document retrieval and similarity matching.
 
 =============
-To run the program:
+In order to use AMR, you will need the following Python libraaries:
 
-Install scipy, numpy, and gensim on your machine by following the instructions here: http://radimrehurek.com/gensim/install.html
+NLTK
+GenSim
+SciKit-Learn
+Numpy
+Scipy
 
-Then just run main.py inside the automailreply folder.
+Run main.py to get started and set up the keywords text for the archive of emails. Once this is completed you can run ProcessEmail.py to have amr continuously check for a new email and when a new one comes in, it will send you the best possible match for that message!
 
 =============
-AutoMailReply is using gensim found here: http://radimrehurek.com/gensim/about.html
-Thanks gensim!
+This system was developed as my thesis for my master's degree in computer science. If you would like to read my full thesis you will be able to find it on the University of Maine's library page. (I will add a link to it once it is published online.)
 
-NOTE: This project still needs to be finished. Use at your own risk.
+=============
+NOTE: This project does not guarantee anything. Use at your own risk.
